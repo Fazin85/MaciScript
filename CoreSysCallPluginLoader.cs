@@ -6,7 +6,7 @@
         {
             public override int ID => 1;
 
-            public override void Call(MaciRuntimeData runtimeData)
+            public override void Call(ref MaciRuntimeData runtimeData)
             {
                 Console.WriteLine($"{runtimeData.SystemRegisters[1]}");
             }
@@ -16,7 +16,7 @@
         {
             public override int ID => 2;
 
-            public override void Call(MaciRuntimeData runtimeData)
+            public override void Call(ref MaciRuntimeData runtimeData)
             {
                 int address = runtimeData.SystemRegisters[1];
                 string s = "";
@@ -32,7 +32,7 @@
         {
             public override int ID => 3;
 
-            public override void Call(MaciRuntimeData runtimeData)
+            public override void Call(ref MaciRuntimeData runtimeData)
             {
                 Environment.Exit(runtimeData.SystemRegisters[1]);
             }
@@ -42,7 +42,7 @@
         {
             public override int ID => 4;
 
-            public override void Call(MaciRuntimeData runtimeData)
+            public override void Call(ref MaciRuntimeData runtimeData)
             {
                 int labelIndex = runtimeData.SystemRegisters[1];
 

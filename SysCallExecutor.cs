@@ -21,11 +21,11 @@
             }
         }
 
-        public void Execute(MaciRuntimeData runtimeData, int syscallId)
+        public void Execute(ref MaciRuntimeData runtimeData, int syscallId)
         {
             if (_systemCalls.TryGetValue(syscallId, out SysCall? sysCall))
             {
-                sysCall.Call(runtimeData);
+                sysCall.Call(ref runtimeData);
             }
             else
             {

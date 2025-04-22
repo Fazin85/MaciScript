@@ -4,6 +4,6 @@
     {
         public abstract int ID { get; }
 
-        public abstract void Call(MaciRuntimeData runtimeData);
+        public abstract void Call(ref MaciRuntimeData runtimeData);
     }
 }

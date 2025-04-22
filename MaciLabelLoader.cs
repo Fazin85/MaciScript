@@ -6,38 +6,30 @@ namespace MaciScript
     {
         public FrozenDictionary<string, int> LabelNameToIndex => labelNameToIndex.ToFrozenDictionary();
 
-        private readonly MaciRuntimeData runtimeData;
         private readonly Dictionary<string, int> labelNameToIndex = [];
 
-        public MaciLabelLoader(MaciRuntimeData runtimeData)
+        public bool TryLoad(string line, int instructionIndex, List<MaciLabel> labels)
         {
-            this.runtimeData = runtimeData;
-        }
-
-        public bool TryLoad(string line, int instructionIndex, out MaciLabel label)
-        {
-            label = default;
-
             if (line.EndsWith(":"))
             {
                 string labelName = line[..^1].Trim();
-                foreach (var l in runtimeData.Labels)
+                foreach (var l in labels)
                 {
                     if (labelName == l.Name)
                     {
-                        throw new Exception("Cannot have duplicate labels: " + label);
+                        throw new Exception("Cannot have duplicate labels: " + labelName);
                     }
                 }
 
-                label = new MaciLabel
+                var label = new MaciLabel
                 {
                     Address = instructionIndex,
                     Name = labelName
                 };
 
                 // Store label info
-                runtimeData.Labels.Add(label);
-                labelNameToIndex[label.Name] = runtimeData.Labels.Count - 1;
+                labels.Add(label);
+                labelNameToIndex[label.Name] = labels.Count - 1;
 
                 return true;
             }

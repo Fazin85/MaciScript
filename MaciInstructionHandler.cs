@@ -2,16 +2,14 @@
 {
     public class MaciInstructionHandler
     {
-        private readonly MaciRuntimeData runtimeData;
         private readonly Action<string> debugLog;
 
-        public MaciInstructionHandler(MaciRuntimeData runtimeData, Action<string> debugLog)
+        public MaciInstructionHandler(Action<string> debugLog)
         {
-            this.runtimeData = runtimeData;
             this.debugLog = debugLog;
         }
 
-        public void Handle(SysCallExecutor sysCallExecutor, MaciInstruction instruction)
+        public void Handle(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor, MaciInstruction instruction)
         {
             try
             {
@@ -192,7 +190,7 @@
                             int labelIndex = instruction.Operands[0].Value;
 
                             // Make sure it's a valid index
-                            if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Count)
+                            if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Length)
                             {
                                 throw new Exception($"Invalid label index: {labelIndex}");
                             }
@@ -210,7 +208,7 @@
                             if (runtimeData.Registers[15] == 0)
                             {
                                 int labelIndex = instruction.Operands[0].Value;
-                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Count)
+                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Length)
                                 {
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
@@ -232,7 +230,7 @@
                             if (runtimeData.Registers[15] != 0)
                             {
                                 int labelIndex = instruction.Operands[0].Value;
-                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Count)
+                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Length)
                                 {
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
@@ -254,7 +252,7 @@
                             if (runtimeData.Registers[15] > 0)
                             {
                                 int labelIndex = instruction.Operands[0].Value;
-                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Count)
+                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Length)
                                 {
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
@@ -276,7 +274,7 @@
                             if (runtimeData.Registers[15] < 0)
                             {
                                 int labelIndex = instruction.Operands[0].Value;
-                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Count)
+                                if (labelIndex < 0 || labelIndex >= runtimeData.Labels.Length)
                                 {
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
@@ -335,7 +333,7 @@
                             int functionIndex = instruction.Operands[0].Value;
 
                             // Make sure it's a valid index
-                            if (functionIndex < 0 || functionIndex >= runtimeData.Functions.Count)
+                            if (functionIndex < 0 || functionIndex >= runtimeData.Functions.Length)
                             {
                                 throw new Exception($"Invalid function index: {functionIndex}");
                             }
@@ -352,15 +350,8 @@
 
                     case MaciOpcode.Ret:
                         {
-                            if (runtimeData.CallStack.Count > 0)
-                            {
-                                runtimeData.ProgramCounter = runtimeData.CallStack.Pop();
-                                debugLog($"Returning to position {runtimeData.ProgramCounter + 1}");
-                            }
-                            else
-                            {
-                                throw new Exception("Return without call");
-                            }
+                            runtimeData.ProgramCounter = runtimeData.CallStack.Pop();
+                            debugLog($"Returning to position {runtimeData.ProgramCounter + 1}");
                         }
                         break;
 
@@ -369,7 +360,7 @@
                             int syscallNumber = runtimeData.SystemRegisters[0];
                             debugLog($"Executing syscall {syscallNumber}");
 
-                            sysCallExecutor.Execute(runtimeData, syscallNumber);
+                            sysCallExecutor.Execute(ref runtimeData, syscallNumber);
                         }
                         break;
                     case MaciOpcode.Fidx:
