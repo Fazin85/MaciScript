@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MaciScript": {
+      "commandName": "Project",
+      "commandLineArgs": "test.asm"
+    }
+  }
+}
