@@ -1,4 +1,4 @@
-﻿namespace MaciScript
+﻿namespace MaciScript.Program
 {
     /// <summary>
     /// Main entry point
@@ -28,7 +28,7 @@
 
                 var runtimeData = new MaciRuntimeData();
                 var instructionHandler = new MaciInstructionHandler(runtimeData, (_) => { });
-                var runtime = new MaciScriptRuntime(instructionHandler, debugMode);
+                var runtime = new MaciScriptRuntime(debugMode);
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 
                 if (debugMode)
@@ -37,7 +37,7 @@
                 }
 
                 runtime.LoadProgram(runtimeData, source);
-                runtime.Execute(runtimeData, syscallExcecutor);
+                runtime.Execute(runtimeData, instructionHandler, syscallExcecutor);
             }
             catch (Exception ex)
             {

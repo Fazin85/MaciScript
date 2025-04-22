@@ -10,13 +10,9 @@ namespace MaciScript
         // Parsed instructions ready for execution
         private MaciInstruction[] _instructions = [];
 
-        private readonly MaciInstructionHandler instructionHandler;
-
-        public MaciScriptRuntime(MaciInstructionHandler instructionHandler, bool debugMode = false)
+        public MaciScriptRuntime(bool debugMode = false)
         {
             _debugMode = debugMode;
-
-            this.instructionHandler = instructionHandler;
         }
 
         // Helper method for debug logging
@@ -226,7 +222,7 @@ namespace MaciScript
             return resultOperands;
         }
 
-        public void Execute(MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor)
+        public void Execute(MaciRuntimeData runtimeData, MaciInstructionHandler instructionHandler, SysCallExecutor sysCallExecutor)
         {
             runtimeData.ProgramCounter = 0;
 
