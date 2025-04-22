@@ -2,7 +2,7 @@
   "profiles": {
     "MaciScript": {
       "commandName": "Project",
-      "commandLineArgs": "test.asm"
+      "commandLineArgs": "loop_test.maci"
     }
   }
 }

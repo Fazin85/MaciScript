@@ -25,15 +25,19 @@
                 }
 
                 string source = File.ReadAllText(filename);
-                var runtime = new MaciScriptRuntime(debugMode);
+
+                var runtimeData = new MaciRuntimeData();
+                var instructionHandler = new MaciInstructionHandler(runtimeData, (_) => { });
+                var runtime = new MaciScriptRuntime(instructionHandler, debugMode);
+                var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 
                 if (debugMode)
                 {
                     Console.WriteLine($"Debug mode enabled. Loading program from '{filename}'...");
                 }
 
-                runtime.LoadProgram(source);
-                runtime.Execute();
+                runtime.LoadProgram(runtimeData, source);
+                runtime.Execute(runtimeData, syscallExcecutor);
             }
             catch (Exception ex)
             {

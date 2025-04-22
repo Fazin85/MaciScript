@@ -27,5 +27,5 @@ loop_start:
 
 ; Exit
 mov S1, 0
-mov S0, 4
+mov S0, 3
 syscall
