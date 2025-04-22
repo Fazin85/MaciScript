@@ -1,13 +1,11 @@
-﻿namespace MaciScript
+﻿using System.Collections.Frozen;
+
+namespace MaciScript
 {
     public class MaciScriptRuntime
     {
         // Debug mode flag
         private readonly bool _debugMode = false;
-
-        // For mapping names to indices
-        private readonly Dictionary<string, int> _labelNameToIndex = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, int> _functionNameToIndex = new(StringComparer.OrdinalIgnoreCase);
 
         // Parsed instructions ready for execution
         private MaciInstruction[] _instructions = [];
@@ -32,6 +30,9 @@
 
         public void LoadProgram(MaciRuntimeData runtimeData, string source)
         {
+            MaciFunctionLoader functionLoader = new(runtimeData);
+            MaciLabelLoader labelLoader = new(runtimeData);
+
             try
             {
                 // First pass: collect all labels and function addresses
@@ -49,36 +50,16 @@
                         continue;
 
                     // Check for function declarations
-                    if (line.StartsWith("function") && line.EndsWith(":"))
+                    if (functionLoader.TryLoad(line, instructionIndex, out MaciFunction function))
                     {
-                        // Extract just the function name between "function" and ":"
-                        string funcName = line[8..^1].Trim();
-
-                        // Store function info
-                        runtimeData.Functions.Add(instructionIndex);
-                        _functionNameToIndex[funcName] = runtimeData.Functions.Count - 1;
-
-                        DebugLog($"Function found: {funcName} at position {instructionIndex}");
+                        DebugLog($"Function found: {function.Name} at position {instructionIndex}");
                         continue;
                     }
 
                     // Check for regular labels
-                    if (line.EndsWith(":"))
+                    if (labelLoader.TryLoad(line, instructionIndex, out MaciLabel label))
                     {
-                        string label = line[..^1].Trim();
-                        foreach (var tuple in runtimeData.Labels)
-                        {
-                            if (label == tuple.Item1)
-                            {
-                                throw new Exception("Cannot have duplicate labels: " + label);
-                            }
-                        }
-
-                        // Store label info
-                        runtimeData.Labels.Add(new(label, instructionIndex));
-                        _labelNameToIndex[label] = runtimeData.Labels.Count - 1;
-
-                        DebugLog($"Label found: {label} at position {instructionIndex}");
+                        DebugLog($"Label found: {label.Name} at position {instructionIndex}");
                         continue;
                     }
 
@@ -89,13 +70,13 @@
                 if (_debugMode)
                 {
                     Console.WriteLine("Label mappings:");
-                    foreach (var kvp in _labelNameToIndex)
+                    foreach (var kvp in labelLoader.LabelNameToIndex)
                     {
                         Console.WriteLine($"  {kvp.Key} -> {kvp.Value}");
                     }
 
                     Console.WriteLine("Function mappings:");
-                    foreach (var kvp in _functionNameToIndex)
+                    foreach (var kvp in functionLoader.FunctionNameToIndex)
                     {
                         Console.WriteLine($"  {kvp.Key} -> {kvp.Value}");
                     }
@@ -116,7 +97,7 @@
                         continue;
 
                     // Parse instruction
-                    var instruction = ParseInstruction(line);
+                    var instruction = ParseInstruction(functionLoader.FunctionNameToIndex, labelLoader.LabelNameToIndex, line);
                     instructions.Add(instruction);
                     DebugLog($"Added instruction: {instruction.Opcode} with {instruction.Operands?.Length ?? 0} operands");
                 }
@@ -131,7 +112,10 @@
             }
         }
 
-        private MaciInstruction ParseInstruction(string line)
+        private MaciInstruction ParseInstruction(
+            FrozenDictionary<string, int> functionNameToIndex,
+            FrozenDictionary<string, int> labelNameToIndex,
+            string line)
         {
             try
             {
@@ -168,7 +152,7 @@
                     // For calls, look up in function dictionary
                     if (parsedOpcode == MaciOpcode.Call)
                     {
-                        if (_functionNameToIndex.TryGetValue(targetName, out int index))
+                        if (functionNameToIndex.TryGetValue(targetName, out int index))
                         {
                             instruction.Operands[0].Value = index;
                             DebugLog($"Resolved function '{targetName}' to index {index}");
@@ -181,7 +165,7 @@
                     // For jumps, look up in label dictionary
                     else
                     {
-                        if (_labelNameToIndex.TryGetValue(targetName, out int index))
+                        if (labelNameToIndex.TryGetValue(targetName, out int index))
                         {
                             instruction.Operands[0].Value = index;
                             DebugLog($"Resolved label '{targetName}' to index {index}");

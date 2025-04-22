@@ -6,8 +6,8 @@
         public int[] SystemRegisters;
         public byte[] Memory;
         public int ProgramCounter;
-        public List<Tuple<string, int>> Labels;
-        public List<int> Functions;
+        public List<MaciLabel> Labels;
+        public List<MaciFunction> Functions;
         public Stack<int> CallStack;
 
         public const uint MaxMem = uint.MaxValue;
@@ -16,7 +16,7 @@
         {
         }
 
-        public MaciRuntimeData(int[] registers, int[] systemRegisters, byte[] memory, List<Tuple<string, int>> labels, List<int> functions, Stack<int> callstack)
+        public MaciRuntimeData(int[] registers, int[] systemRegisters, byte[] memory, List<MaciLabel> labels, List<MaciFunction> functions, Stack<int> callstack)
         {
             Registers = registers;
             SystemRegisters = systemRegisters;

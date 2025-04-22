@@ -198,9 +198,9 @@
                             }
 
                             // Get the target address from the label list
-                            int address = runtimeData.Labels[labelIndex].Item2;
+                            int address = runtimeData.Labels[labelIndex].Address;
                             runtimeData.ProgramCounter = address - 1; // -1 because PC will be incremented after this
-                            debugLog($"JMP to label '{runtimeData.Labels[labelIndex].Item1}' at position {address}");
+                            debugLog($"JMP to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                         }
                         break;
 
@@ -215,9 +215,9 @@
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
 
-                                int address = runtimeData.Labels[labelIndex].Item2;
+                                int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JE to label '{runtimeData.Labels[labelIndex].Item1}' at position {address}");
+                                debugLog($"JE to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                             }
                             else
                             {
@@ -237,9 +237,9 @@
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
 
-                                int address = runtimeData.Labels[labelIndex].Item2;
+                                int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JNE to label '{runtimeData.Labels[labelIndex].Item1}' at position {address}");
+                                debugLog($"JNE to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                             }
                             else
                             {
@@ -259,9 +259,9 @@
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
 
-                                int address = runtimeData.Labels[labelIndex].Item2;
+                                int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JG to label '{runtimeData.Labels[labelIndex].Item1}' at position {address}");
+                                debugLog($"JG to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                             }
                             else
                             {
@@ -281,9 +281,9 @@
                                     throw new Exception($"Invalid label index: {labelIndex}");
                                 }
 
-                                int address = runtimeData.Labels[labelIndex].Item2;
+                                int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JL to label '{runtimeData.Labels[labelIndex].Item1}' at position {address}");
+                                debugLog($"JL to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                             }
                             else
                             {
@@ -341,12 +341,12 @@
                             }
 
                             // Get the function address and push current position to call stack
-                            int address = runtimeData.Functions[functionIndex];
+                            int address = runtimeData.Functions[functionIndex].Address;
 
                             // Push current PC to call stack
                             runtimeData.CallStack.Push(runtimeData.ProgramCounter);
                             runtimeData.ProgramCounter = address - 1; // -1 because PC will be incremented after this
-                            //debugLog($"Call to function '{_functionNames[functionIndex]}' at position {address}");
+                            debugLog($"Call to function '{runtimeData.Functions[functionIndex].Name}' at position {address}");
                         }
                         break;
 
