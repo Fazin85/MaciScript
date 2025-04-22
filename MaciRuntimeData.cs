@@ -1,4 +1,6 @@
-﻿namespace MaciScript
+﻿using System.Diagnostics;
+
+namespace MaciScript
 {
     public struct MaciRuntimeData(int[] registers, int[] systemRegisters, byte[] memory, MaciLabel[] labels, MaciFunction[] functions, MaciCallStack callstack, MaciInstruction[] instructions)
     {
@@ -15,6 +17,26 @@
 
         public MaciRuntimeData() : this(new int[16], new int[8], new byte[1024 * 1024 * 64], [], [], new(16384), [])
         {
+        }
+
+        public void AddCodeUnits(List<MaciCodeUnit> codeUnits)
+        {
+            Debug.Assert(codeUnits.Count > 0);
+
+            List<MaciLabel> labels = [];
+            List<MaciFunction> functions = [];
+            List<MaciInstruction> instructions = [];
+
+            for (int i = 0; i < codeUnits.Count; i++)
+            {
+                labels.AddRange(codeUnits[i].Labels);
+                functions.AddRange(codeUnits[i].Functions);
+                instructions.AddRange(codeUnits[i].Instructions);
+            }
+
+            Labels = [.. labels];
+            Functions = [.. functions];
+            Instructions = [.. instructions];
         }
     }
 }

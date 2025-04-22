@@ -27,24 +27,37 @@
 
         public readonly byte[] ToByteArray()
         {
-            byte[] bytes = new byte[(arr.Length * sizeof(int)) + sizeof(int)];
+            int totalSize = sizeof(int) + sizeof(int) + (arr.Length * sizeof(int));
+            byte[] result = new byte[totalSize];
 
-            byte[] topBytes = BitConverter.GetBytes(top);
-            bytes[0] = topBytes[0];
-            bytes[1] = topBytes[1];
-            bytes[2] = topBytes[2];
-            bytes[3] = topBytes[3];
+            BitConverter.GetBytes(top).CopyTo(result, 0);
 
-            for (int i = 4; i < bytes.Length; i += 4)
+            BitConverter.GetBytes(arr.Length).CopyTo(result, sizeof(int));
+
+            for (int i = 0; i < arr.Length; i++)
             {
-                byte[] intBytes = BitConverter.GetBytes(arr[i / 4]);
-                bytes[i] = intBytes[0];
-                bytes[i + 1] = intBytes[1];
-                bytes[i + 2] = intBytes[2];
-                bytes[i + 3] = intBytes[3];
+                BitConverter.GetBytes(arr[i]).CopyTo(result, (i * sizeof(int)) + (2 * sizeof(int)));
             }
 
-            return bytes;
+            return result;
+        }
+
+        public static MaciCallStack FromByteArray(byte[] data)
+        {
+            int top = BitConverter.ToInt32(data, 0);
+            int arrayLength = BitConverter.ToInt32(data, sizeof(int));
+
+            MaciCallStack stack = new(arrayLength)
+            {
+                top = top
+            };
+
+            for (int i = 0; i < arrayLength; i++)
+            {
+                stack.arr[i] = BitConverter.ToInt32(data, (i * sizeof(int)) + (2 * sizeof(int)));
+            }
+
+            return stack;
         }
     }
 }
