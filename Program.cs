@@ -1,7 +1,7 @@
 ﻿namespace MaciScript
 {
     /// <summary>
-    /// Main entry point for the assembly language runtime
+    /// Main entry point
     /// </summary>
     class Program
     {
@@ -9,7 +9,7 @@
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: MaciRuntime <filename> [--debug]");
+                Console.WriteLine("Usage: MaciScriptRuntime <filename> [--debug]");
                 return;
             }
 
@@ -25,7 +25,7 @@
                 }
 
                 string source = File.ReadAllText(filename);
-                var runtime = new AssemblyRuntime(debugMode);
+                var runtime = new MaciScriptRuntime(debugMode);
 
                 if (debugMode)
                 {

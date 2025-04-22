@@ -2,10 +2,7 @@
 
 namespace MaciScript
 {
-    /// <summary>
-    /// The memory model and execution environment for our assembly language
-    /// </summary>
-    public class AssemblyRuntime
+    public class MaciScriptRuntime
     {
         // Debug mode flag
         private readonly bool _debugMode = false;
@@ -29,7 +26,7 @@ namespace MaciScript
         // Parsed instructions ready for execution
         private Instruction[] _instructions = [];
 
-        public AssemblyRuntime(bool debugMode = false)
+        public MaciScriptRuntime(bool debugMode = false)
         {
             _debugMode = debugMode;
 
@@ -869,5 +866,41 @@ namespace MaciScript
 
         [FieldOffset(4)]
         public int Value;
+    }
+
+    public enum MaciOpcode : byte
+    {
+        // Data Movement
+        Mov,
+        Load,
+        Store,
+
+        // Arithmetic
+        Add,
+        Sub,
+        Mul,
+        Div,
+
+        // Bitwise
+        And,
+        Or,
+        Xor,
+        Shl,
+        Shr,
+
+        // Comparison
+        Cmp,
+
+        // Control Flow
+        Jmp,
+        Je,
+        Jne,
+        Jg,
+        Jl,
+        Call,
+        Ret,
+
+        // System
+        Syscall
     }
 }
