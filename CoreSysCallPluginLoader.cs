@@ -38,12 +38,25 @@
             }
         }
 
+        private class SysCallPrintLabel : SysCall
+        {
+            public override int ID => 4;
+
+            public override void Call(MaciRuntimeData runtimeData)
+            {
+                int labelIndex = runtimeData.SystemRegisters[1];
+
+                Console.WriteLine(runtimeData.Labels[labelIndex].Name);
+            }
+        }
+
         public SysCallPlugin Load()
         {
             List<SysCall> sysCalls = [
                 new SysCallPrintInt(),
                 new SysCallPrintString(),
-                new SysCallExit()];
+                new SysCallExit(),
+                new SysCallPrintLabel()];
 
             return new SysCallPlugin(sysCalls, "core");
         }

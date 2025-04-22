@@ -372,6 +372,22 @@
                             sysCallExecutor.Execute(runtimeData, syscallNumber);
                         }
                         break;
+                    case MaciOpcode.Fidx:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            int functionIndex = instruction.Operands[1].Value;
+
+                            runtimeData.SystemRegisters[destReg] = functionIndex;
+                        }
+                        break;
+                    case MaciOpcode.Lidx:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            int labelIndex = instruction.Operands[1].Value;
+
+                            runtimeData.SystemRegisters[destReg] = labelIndex;
+                        }
+                        break;
 
                     default:
                         throw new Exception($"Unknown opcode: {instruction.Opcode}");

@@ -33,6 +33,8 @@
         Ret,
 
         // System
-        Syscall
+        Syscall,
+        Lidx,
+        Fidx
     }
 }

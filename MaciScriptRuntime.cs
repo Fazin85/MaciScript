@@ -2,6 +2,9 @@
 
 namespace MaciScript
 {
+    //TODO: fix SysCallPrintLabel always printing first label
+    //TODO: stop functions from being excecuted in order regardless of whether or not they are called
+
     public class MaciScriptRuntime
     {
         // Debug mode flag
@@ -175,7 +178,7 @@ namespace MaciScript
                 else if (operandStrings.Length > 0)
                 {
                     // For regular instructions, parse operands normally
-                    instruction.Operands = ParseOperands(operandStrings);
+                    instruction.Operands = ParseOperands(parsedOpcode, operandStrings, functionNameToIndex, labelNameToIndex);
                 }
 
                 return instruction;
@@ -196,7 +199,11 @@ namespace MaciScript
                    opcode == MaciOpcode.Jl;
         }
 
-        private static MaciOperand[] ParseOperands(string[] operands)
+        private static MaciOperand[] ParseOperands(
+            MaciOpcode opcode,
+            string[] operands,
+            FrozenDictionary<string, int> functionNameToIndex,
+            FrozenDictionary<string, int> labelNameToIndex)
         {
             MaciOperand[] resultOperands = new MaciOperand[operands.Length];
 
@@ -211,6 +218,10 @@ namespace MaciScript
                 {
                     resultOperands[i].IsSysReg = true;
                     resultOperands[i].Value = ParseSyscallRegister(operands[i]);
+                }
+                else if ((opcode == MaciOpcode.Fidx || opcode == MaciOpcode.Lidx) && i == 1)
+                {
+                    resultOperands[i].Value = opcode == MaciOpcode.Fidx ? functionNameToIndex[operands[i]] : labelNameToIndex[operands[i]];
                 }
                 else
                 {
