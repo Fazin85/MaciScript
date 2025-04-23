@@ -26,7 +26,6 @@
             if (_systemCalls.TryGetValue(syscallId, out SysCall? sysCall))
             {
                 sysCall.Call(ref runtimeData);
-                Console.WriteLine("executed syscall with id: " + syscallId);
             }
             else
             {
