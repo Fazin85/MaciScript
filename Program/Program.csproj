@@ -15,6 +15,9 @@
     <None Update="loop_test.maci">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="main.maci">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

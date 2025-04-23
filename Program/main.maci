@@ -1,0 +1,28 @@
+; Hello World Program
+
+call hello_world
+
+; set the exit code to 0
+mov S1 0
+
+; set the syscall number to 3, the number of the exit syscall
+mov S0 3
+
+syscall
+
+; function declarations in the first file provided to the runtime must be below the exit syscall or they will be executed as normal code.
+
+function hello_world:
+	
+	; loads the index of the string literal "Hello World!" into register 5
+	ldstr R5 "Hello World!"
+	
+	; move the index of the string literal into syscall register 1
+	mov S1 R5
+	
+	; set the syscall number to 4, the number for printing a string literal. see CoreSysCallPluginLoader.cs for all of the core syscalls
+	mov S0 4
+	
+	syscall
+	
+	ret

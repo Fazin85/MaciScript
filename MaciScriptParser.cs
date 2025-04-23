@@ -4,20 +4,17 @@ namespace MaciScript
 {
     public static class MaciScriptParser
     {
-        public static MaciInstruction ParseInstruction(
-    FrozenDictionary<string, int> functionNameToIndex,
-    FrozenDictionary<string, int> labelNameToIndex,
-    string line)
+        public static MaciInstruction ParseInstruction(MaciParseInput input)
         {
             try
             {
                 // Remove comments
-                int commentIndex = line.IndexOf(';');
+                int commentIndex = input.Line.IndexOf(';');
                 if (commentIndex >= 0)
-                    line = line[..commentIndex].Trim();
+                    input.Line = input.Line[..commentIndex].Trim();
 
                 // Split into opcode and operands
-                string[] parts = line.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = input.Line.Split([' ', ','], StringSplitOptions.RemoveEmptyEntries);
 
                 if (parts.Length == 0)
                     throw new Exception("Empty instruction");
@@ -37,46 +34,69 @@ namespace MaciScript
                 // Check if this is a control flow instruction
                 bool isControlFlow = IsControlFlowInstruction(parsedOpcode);
 
-                if (isControlFlow && operandStrings.Length > 0)
+                if (operandStrings.Length > 0)
                 {
-                    string targetName = operandStrings[0];
-
-                    // For calls, look up in function dictionary
-                    if (parsedOpcode == MaciOpcode.Call)
+                    if (isControlFlow)
                     {
-                        if (functionNameToIndex.TryGetValue(targetName, out int index))
+                        string targetName = operandStrings[0];
+
+                        // For calls, look up in function dictionary
+                        if (parsedOpcode == MaciOpcode.Call)
                         {
-                            instruction.Operands[0].Value = index;
+                            if (input.FunctionNameToIndex.TryGetValue(targetName, out int index))
+                            {
+                                instruction.Operands[0].Value = index;
+                            }
+                            else
+                            {
+                                throw new Exception($"Function not found: {targetName}");
+                            }
+                        }
+                        // For jumps, look up in label dictionary
+                        else
+                        {
+                            if (input.LabelNameToIndex.TryGetValue(targetName, out int index))
+                            {
+                                instruction.Operands[0].Value = index;
+                            }
+                            else
+                            {
+                                throw new Exception($"Label not found: {targetName}");
+                            }
+                        }
+                    }
+                    else if (parsedOpcode == MaciOpcode.Ldstr)
+                    {
+                        if (input.StringLines.TryGetValue(input.LineNumber, out string? targetName))
+                        {
+                            targetName = Util.ExtractNestedQuotes(targetName) ?? throw new Exception("Failed to extract string from targetName");
+
+                            if (input.StringToIndex.TryGetValue(targetName, out int index))
+                            {
+                                instruction.Operands[1].Value = index;
+                            }
+                            else
+                            {
+                                throw new Exception($"String not found: {targetName}");
+                            }
                         }
                         else
                         {
-                            throw new Exception($"Function not found: {targetName}");
+                            throw new Exception($"No string at line {input.LineNumber}");
                         }
                     }
-                    // For jumps, look up in label dictionary
                     else
                     {
-                        if (labelNameToIndex.TryGetValue(targetName, out int index))
-                        {
-                            instruction.Operands[0].Value = index;
-                        }
-                        else
-                        {
-                            throw new Exception($"Label not found: {targetName}");
-                        }
+                        // For regular instructions, parse operands normally
+                        instruction.Operands = ParseOperands(parsedOpcode, operandStrings, input.FunctionNameToIndex, input.LabelNameToIndex, input.StringToIndex);
                     }
-                }
-                else if (operandStrings.Length > 0)
-                {
-                    // For regular instructions, parse operands normally
-                    instruction.Operands = ParseOperands(parsedOpcode, operandStrings, functionNameToIndex, labelNameToIndex);
                 }
 
                 return instruction;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to parse instruction '{line}': {ex.Message}");
+                throw new Exception($"Failed to parse instruction '{input.Line}': {ex.Message}");
             }
         }
 
@@ -94,7 +114,8 @@ namespace MaciScript
             MaciOpcode opcode,
             string[] operands,
             FrozenDictionary<string, int> functionNameToIndex,
-            FrozenDictionary<string, int> labelNameToIndex)
+            FrozenDictionary<string, int> labelNameToIndex,
+            FrozenDictionary<string, int> stringToIndex)
         {
             MaciOperand[] resultOperands = new MaciOperand[operands.Length];
 
@@ -109,10 +130,6 @@ namespace MaciScript
                 {
                     resultOperands[i].IsSysReg = true;
                     resultOperands[i].Value = ParseSyscallRegister(operands[i]);
-                }
-                else if ((opcode == MaciOpcode.Fidx || opcode == MaciOpcode.Lidx) && i == 1)
-                {
-                    resultOperands[i].Value = opcode == MaciOpcode.Fidx ? functionNameToIndex[operands[i]] : labelNameToIndex[operands[i]];
                 }
                 else
                 {

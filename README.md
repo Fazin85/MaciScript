@@ -1,5 +1,5 @@
 MaciScript is a simple assembly like language.
 
-see Program.cs for usage example.
+see Program/Program.cs for example usage.
 
-see loop_test.maci for simple test program.
+see Program/main.maci for hello world program.

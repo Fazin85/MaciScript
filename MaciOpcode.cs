@@ -34,7 +34,6 @@
 
         // System
         Syscall,
-        Lidx,
-        Fidx
+        Ldstr
     }
 }

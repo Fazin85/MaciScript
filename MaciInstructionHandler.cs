@@ -326,20 +326,10 @@
                             sysCallExecutor.Execute(ref runtimeData, syscallNumber);
                         }
                         break;
-                    case MaciOpcode.Fidx:
-                        {
-                            int destReg = instruction.Operands[0].Value;
-                            int functionIndex = instruction.Operands[1].Value;
 
-                            runtimeData.SystemRegisters[destReg] = functionIndex;
-                        }
-                        break;
-                    case MaciOpcode.Lidx:
+                    case MaciOpcode.Ldstr:
                         {
-                            int destReg = instruction.Operands[0].Value;
-                            int labelIndex = instruction.Operands[1].Value;
-
-                            runtimeData.SystemRegisters[destReg] = labelIndex;
+                            runtimeData.Registers[instruction.Operands[0].Value] = instruction.Operands[1].Value;
                         }
                         break;
 

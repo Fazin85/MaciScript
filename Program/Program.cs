@@ -5,37 +5,56 @@
     /// </summary>
     class Program
     {
+        public static List<string> ValidateFiles(string[] args)
+        {
+            if (args == null || args.Length == 0)
+            {
+                throw new ArgumentException("No files specified");
+            }
+
+            List<string> validFiles = [];
+
+            foreach (string filePath in args)
+            {
+                if (File.Exists(filePath))
+                {
+                    validFiles.Add(filePath);
+                }
+                else
+                {
+                    throw new FileNotFoundException($"File not found: {filePath}");
+                }
+            }
+
+            return validFiles;
+        }
+
         static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: MaciScriptRuntime <filename> [--debug]");
+                Console.WriteLine("Usage: MaciScriptRuntime <filenames>");
                 return;
             }
 
             try
             {
-                bool debugMode = args.Length > 1 && args[1] == "--debug";
-                string filename = args[0];
+                var files = ValidateFiles(args);
 
-                if (!File.Exists(filename))
+                List<MaciCodeUnit> codeUnits = [];
+
+                foreach (var file in files)
                 {
-                    Console.WriteLine($"Error: File '{filename}' not found.");
-                    return;
-                }
+                    var source = File.ReadAllText(file);
+                    var codeUnit = MaciCodeUnit.FromString(source);
 
-                string source = File.ReadAllText(filename);
-                var codeUnit = MaciCodeUnit.FromString(source);
+                    codeUnits.Add(codeUnit);
+                }
 
                 var runtimeData = new MaciRuntimeData();
-                runtimeData.AddCodeUnits([codeUnit]);
+                runtimeData.AddCodeUnits(codeUnits);
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
-
-                if (debugMode)
-                {
-                    Console.WriteLine($"Debug mode enabled. Loading program from '{filename}'...");
-                }
 
                 MaciScriptRuntime.Execute(ref runtimeData, syscallExcecutor);
             }

@@ -25,8 +25,6 @@ loop_start:
     mov S0, 1
     syscall
 
-    call print_loop_start
-
 ; call test_func
 
 
@@ -34,24 +32,3 @@ loop_start:
 mov S1, 0
 mov S0, 3
 syscall
-
-hello_world:
-
-function test_func:
-
-    lidx R5 hello_world
-
-    mov S1 R5
-    mov S0 4
-    syscall
-
-    ret
-
-function print_loop_start:
-    lidx R5 loop_start
-
-    mov S1 R5
-    mov S0 4
-    syscall
-
-    ret

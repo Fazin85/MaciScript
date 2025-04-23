@@ -5,20 +5,26 @@
         public MaciFunction[] Functions { get; private set; }
         public MaciLabel[] Labels { get; private set; }
         public MaciInstruction[] Instructions { get; private set; }
+        public string[] Strings { get; private set; }
 
+#nullable disable
         private MaciCodeUnit()
         {
 
         }
+#nullable enable
 
         public static MaciCodeUnit FromString(string source)
         {
             MaciCodeUnit codeUnit = new();
             MaciFunctionLoader functionLoader = new();
+            MaciStringLoader stringLoader = new();
             MaciLabelLoader labelLoader = new();
 
             List<MaciFunction> functions = [];
             List<MaciLabel> labels = [];
+            List<string> strings = [];
+            Dictionary<int, string> stringLines = [];
 
             try
             {
@@ -30,18 +36,11 @@
                 {
                     string line = lines[i].Trim();
 
-                    // Skip comments and empty lines
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";"))
-                        continue;
-
-                    // Check for function declarations
-                    if (functionLoader.TryLoad(line, instructionIndex, functions))
-                    {
-                        continue;
-                    }
-
-                    // Check for regular labels
-                    if (labelLoader.TryLoad(line, instructionIndex, labels))
+                    if (string.IsNullOrWhiteSpace(line) ||
+                        line.StartsWith(';') ||
+                        functionLoader.TryLoad(line, instructionIndex, functions) ||
+                        labelLoader.TryLoad(line, instructionIndex, labels) ||
+                        stringLoader.TryLoad(i, line, strings, stringLines))
                     {
                         continue;
                     }
@@ -49,8 +48,10 @@
                     // Actual instruction that will be executed
                     instructionIndex++;
                 }
+
                 codeUnit.Functions = [.. functions];
                 codeUnit.Labels = [.. labels];
+                codeUnit.Strings = [.. strings];
 
                 List<MaciInstruction> instructions = [];
 
@@ -60,11 +61,13 @@
                     string line = lines[i].Trim();
 
                     // Skip labels, comments, and empty lines
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(";") || line.EndsWith(":"))
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(';') || line.EndsWith(':'))
                         continue;
 
+                    var parseInput = new MaciParseInput(functionLoader.FunctionNameToIndex, labelLoader.LabelNameToIndex, stringLoader.StringToIndex, stringLines, line, i);
+
                     // Parse instruction
-                    var instruction = MaciScriptParser.ParseInstruction(functionLoader.FunctionNameToIndex, labelLoader.LabelNameToIndex, line);
+                    var instruction = MaciScriptParser.ParseInstruction(parseInput);
                     instructions.Add(instruction);
                 }
 

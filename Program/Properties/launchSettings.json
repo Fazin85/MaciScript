@@ -2,7 +2,7 @@
   "profiles": {
     "Program": {
       "commandName": "Project",
-      "commandLineArgs": "loop_test.maci"
+      "commandLineArgs": "main.maci"
     }
   }
 }
