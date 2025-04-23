@@ -22,11 +22,16 @@
 
                 MaciOpcode parsedOpcode = ParseOpcode(opcode);
 
+                bool isLdstrLine = input.StringLines.ContainsKey(input.LineNumber);
+
+                int operandCount = operandStrings.Length;
+                operandCount = Math.Clamp(operandCount, 1, 2);
+
                 // Create instruction with properly sized operands array
                 MaciInstruction instruction = new()
                 {
                     Opcode = parsedOpcode,
-                    Operands = new MaciOperand[Math.Max(1, operandStrings.Length)]
+                    Operands = new MaciOperand[operandCount]
                 };
 
                 // Check if this is a control flow instruction
@@ -71,6 +76,14 @@
 
                             if (input.StringToIndex.TryGetValue(targetName, out int index))
                             {
+                                if (!operandStrings[0].StartsWith("R", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    throw new Exception("ldstr first operand must be a register");
+                                }
+
+                                instruction.Operands[0].IsReg = true;
+                                instruction.Operands[0].Value = ParseRegister(operandStrings[0]);
+
                                 instruction.Operands[1].Value = index;
                             }
                             else

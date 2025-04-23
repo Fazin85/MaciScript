@@ -39,11 +39,13 @@
                     if (string.IsNullOrWhiteSpace(line) ||
                         line.StartsWith(';') ||
                         functionLoader.TryLoad(line, instructionIndex, functions) ||
-                        labelLoader.TryLoad(line, instructionIndex, labels) ||
-                        stringLoader.TryLoad(i, line, strings, stringLines))
+                        labelLoader.TryLoad(line, instructionIndex, labels)
+                        )
                     {
                         continue;
                     }
+
+                    stringLoader.TryLoad(i, line, strings, stringLines);
 
                     // Actual instruction that will be executed
                     instructionIndex++;

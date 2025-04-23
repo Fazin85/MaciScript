@@ -309,7 +309,7 @@
 
                             // Push current PC to call stack
                             runtimeData.CallStack.Push(runtimeData.ProgramCounter);
-                            runtimeData.ProgramCounter = address - 1; // -1 because PC will be incremented after this
+                            runtimeData.ProgramCounter = address - 1;
                         }
                         break;
 
@@ -332,7 +332,6 @@
                             runtimeData.Registers[instruction.Operands[0].Value] = instruction.Operands[1].Value;
                         }
                         break;
-
                     default:
                         throw new Exception($"Unknown opcode: {instruction.Opcode}");
                 }

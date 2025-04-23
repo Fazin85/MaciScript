@@ -1,7 +1,5 @@
 ﻿namespace MaciScript
 {
-    //TODO: fix only one function call executing
-
     public static class MaciScriptRuntime
     {
         public static void Execute(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor)
