@@ -37,12 +37,12 @@ namespace MaciScript
             List<MaciInstruction> instructions = [];
             List<string> strings = [];
 
-            for (int i = 0; i < codeUnits.Count; i++)
+            foreach (MaciCodeUnit codeUnit in codeUnits)
             {
-                labels.AddRange(codeUnits[i].Labels);
-                functions.AddRange(codeUnits[i].Functions);
-                instructions.AddRange(codeUnits[i].Instructions);
-                strings.AddRange(codeUnits[i].Strings);
+                labels.AddRange(codeUnit.Labels);
+                functions.AddRange(codeUnit.Functions);
+                instructions.AddRange(codeUnit.Instructions);
+                strings.AddRange(codeUnit.Strings);
             }
 
             Labels = [.. labels];
