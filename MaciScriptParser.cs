@@ -1,6 +1,4 @@
-﻿using System.Collections.Frozen;
-
-namespace MaciScript
+﻿namespace MaciScript
 {
     public static class MaciScriptParser
     {
@@ -87,8 +85,7 @@ namespace MaciScript
                     }
                     else
                     {
-                        // For regular instructions, parse operands normally
-                        instruction.Operands = ParseOperands(parsedOpcode, operandStrings, input.FunctionNameToIndex, input.LabelNameToIndex, input.StringToIndex);
+                        instruction.Operands = ParseOperands(operandStrings);
                     }
                 }
 
@@ -110,12 +107,7 @@ namespace MaciScript
                    opcode == MaciOpcode.Jl;
         }
 
-        private static MaciOperand[] ParseOperands(
-            MaciOpcode opcode,
-            string[] operands,
-            FrozenDictionary<string, int> functionNameToIndex,
-            FrozenDictionary<string, int> labelNameToIndex,
-            FrozenDictionary<string, int> stringToIndex)
+        private static MaciOperand[] ParseOperands(string[] operands)
         {
             MaciOperand[] resultOperands = new MaciOperand[operands.Length];
 
