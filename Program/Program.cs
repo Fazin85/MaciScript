@@ -30,8 +30,6 @@
                 var runtimeData = new MaciRuntimeData();
                 runtimeData.AddCodeUnits([codeUnit]);
 
-                var instructionHandler = new MaciInstructionHandler((_) => { });
-                var runtime = new MaciScriptRuntime(debugMode);
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 
                 if (debugMode)
@@ -39,7 +37,7 @@
                     Console.WriteLine($"Debug mode enabled. Loading program from '{filename}'...");
                 }
 
-                runtime.Execute(ref runtimeData, instructionHandler, syscallExcecutor);
+                MaciScriptRuntime.Execute(ref runtimeData, syscallExcecutor);
             }
             catch (Exception ex)
             {

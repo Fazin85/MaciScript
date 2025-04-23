@@ -1,15 +1,8 @@
 ﻿namespace MaciScript
 {
-    public class MaciInstructionHandler
+    public static class MaciInstructionHandler
     {
-        private readonly Action<string> debugLog;
-
-        public MaciInstructionHandler(Action<string> debugLog)
-        {
-            this.debugLog = debugLog;
-        }
-
-        public void Handle(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor, MaciInstruction instruction)
+        public static void Handle(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor, MaciInstruction instruction)
         {
             try
             {
@@ -74,13 +67,11 @@
                             {
                                 int srcReg = instruction.Operands[1].Value;
                                 runtimeData.Registers[destReg] += runtimeData.Registers[srcReg];
-                                debugLog($"ADD: R{destReg} = R{destReg}({runtimeData.Registers[destReg] + runtimeData.Registers[srcReg]}) - R{srcReg}({runtimeData.Registers[srcReg]}) = {runtimeData.Registers[destReg]}");
                             }
                             else
                             {
                                 int value = instruction.Operands[1].Value;
                                 runtimeData.Registers[destReg] += value;
-                                debugLog($"ADD: R{destReg} = R{destReg}({runtimeData.Registers[destReg] + value}) - {value} = {runtimeData.Registers[destReg]}");
                             }
                         }
                         break;
@@ -94,13 +85,11 @@
                             {
                                 int srcReg = instruction.Operands[1].Value;
                                 runtimeData.Registers[destReg] -= runtimeData.Registers[srcReg];
-                                debugLog($"SUB: R{destReg} = R{destReg}({runtimeData.Registers[destReg] + runtimeData.Registers[srcReg]}) - R{srcReg}({runtimeData.Registers[srcReg]}) = {runtimeData.Registers[destReg]}");
                             }
                             else
                             {
                                 int value = instruction.Operands[1].Value;
                                 runtimeData.Registers[destReg] -= value;
-                                debugLog($"SUB: R{destReg} = R{destReg}({runtimeData.Registers[destReg] + value}) - {value} = {runtimeData.Registers[destReg]}");
                             }
                         }
                         break;
@@ -173,13 +162,11 @@
                             {
                                 int reg2 = instruction.Operands[1].Value;
                                 runtimeData.Registers[15] = runtimeData.Registers[reg1].CompareTo(runtimeData.Registers[reg2]);
-                                debugLog($"CMP R{reg1}({runtimeData.Registers[reg1]}) with R{reg2}({runtimeData.Registers[reg2]}) = {runtimeData.Registers[15]}");
                             }
                             else
                             {
                                 int value = instruction.Operands[1].Value;
                                 runtimeData.Registers[15] = runtimeData.Registers[reg1].CompareTo(value);
-                                debugLog($"CMP R{reg1}({runtimeData.Registers[reg1]}) with {value} = {runtimeData.Registers[15]}");
                             }
                         }
                         break;
@@ -198,7 +185,6 @@
                             // Get the target address from the label list
                             int address = runtimeData.Labels[labelIndex].Address;
                             runtimeData.ProgramCounter = address - 1; // -1 because PC will be incremented after this
-                            debugLog($"JMP to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
                         }
                         break;
 
@@ -215,11 +201,6 @@
 
                                 int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JE to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
-                            }
-                            else
-                            {
-                                debugLog("JE condition not met, continuing");
                             }
                         }
                         break;
@@ -237,11 +218,6 @@
 
                                 int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JNE to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
-                            }
-                            else
-                            {
-                                debugLog("JNE condition not met, continuing");
                             }
                         }
                         break;
@@ -259,11 +235,6 @@
 
                                 int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JG to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
-                            }
-                            else
-                            {
-                                debugLog("JG condition not met, continuing");
                             }
                         }
                         break;
@@ -281,11 +252,6 @@
 
                                 int address = runtimeData.Labels[labelIndex].Address;
                                 runtimeData.ProgramCounter = address - 1;
-                                debugLog($"JL to label '{runtimeData.Labels[labelIndex].Name}' at position {address}");
-                            }
-                            else
-                            {
-                                debugLog("JL condition not met, continuing");
                             }
                         }
                         break;
@@ -344,21 +310,18 @@
                             // Push current PC to call stack
                             runtimeData.CallStack.Push(runtimeData.ProgramCounter);
                             runtimeData.ProgramCounter = address - 1; // -1 because PC will be incremented after this
-                            debugLog($"Call to function '{runtimeData.Functions[functionIndex].Name}' at position {address}");
                         }
                         break;
 
                     case MaciOpcode.Ret:
                         {
                             runtimeData.ProgramCounter = runtimeData.CallStack.Pop();
-                            debugLog($"Returning to position {runtimeData.ProgramCounter + 1}");
                         }
                         break;
 
                     case MaciOpcode.Syscall:
                         {
                             int syscallNumber = runtimeData.SystemRegisters[0];
-                            debugLog($"Executing syscall {syscallNumber}");
 
                             sysCallExecutor.Execute(ref runtimeData, syscallNumber);
                         }
