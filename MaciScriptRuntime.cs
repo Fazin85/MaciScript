@@ -1,5 +1,7 @@
 ﻿namespace MaciScript
 {
+    //TODO: Add support for multiple files
+
     public static class MaciScriptRuntime
     {
         public static void Execute(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor)

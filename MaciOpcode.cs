@@ -29,6 +29,11 @@
         Jne,
         Jg,
         Jl,
+        Jmpf,
+        Jef,
+        Jnef,
+        Jgf,
+        Jlf,
         Call,
         Ret,
 

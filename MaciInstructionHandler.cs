@@ -4,6 +4,8 @@
     {
         public static void Handle(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor, MaciInstruction instruction)
         {
+            int[] tmp = new int[1];
+
             try
             {
                 switch (instruction.Opcode)
@@ -256,6 +258,51 @@
                         }
                         break;
 
+                    case MaciOpcode.Jmpf:
+                        {
+                            goto case MaciOpcode.Call;
+                        }
+
+                    case MaciOpcode.Jef:
+                        {
+                            // Jump if equal (R15 == 0)
+                            if (runtimeData.Registers[15] == 0)
+                            {
+                                goto case MaciOpcode.Call;
+                            }
+                        }
+                        break;
+
+                    case MaciOpcode.Jnef:
+                        {
+                            // Jump if not equal (R15 != 0)
+                            if (runtimeData.Registers[15] != 0)
+                            {
+                                goto case MaciOpcode.Call;
+                            }
+                        }
+                        break;
+
+                    case MaciOpcode.Jgf:
+                        {
+                            // Jump if greater (R15 > 0)
+                            if (runtimeData.Registers[15] > 0)
+                            {
+                                goto case MaciOpcode.Call;
+                            }
+                        }
+                        break;
+
+                    case MaciOpcode.Jlf:
+                        {
+                            // Jump if less (R15 < 0)
+                            if (runtimeData.Registers[15] < 0)
+                            {
+                                goto case MaciOpcode.Call;
+                            }
+                        }
+                        break;
+
                     case MaciOpcode.Load:
                         {
                             int destReg = instruction.Operands[0].Value;
@@ -280,9 +327,9 @@
                             if (memAddress < 0 || memAddress + 3 >= runtimeData.Memory.Length)
                                 throw new IndexOutOfRangeException("Memory access out of bounds");
 
-                            int valueToStore = runtimeData.Registers[srcReg];
+                            tmp[0] = runtimeData.Registers[srcReg];// the value to store
 
-                            Buffer.BlockCopy(new[] { valueToStore }, 0, runtimeData.Memory, memAddress, sizeof(int)
+                            Buffer.BlockCopy(tmp, 0, runtimeData.Memory, memAddress, sizeof(int)
                             );
                         }
                         break;

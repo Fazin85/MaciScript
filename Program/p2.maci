@@ -1,0 +1,17 @@
+function clamp:
+	cmp R0, R1
+	jlf clamp_set_min
+
+	cmp R0, R2
+	jgf clamp_set_max
+
+	ret
+
+function clamp_set_min:
+	mov R0, R1
+	ret
+
+function clamp_set_max:
+	mov R0, R2
+	ret
+	

@@ -44,7 +44,7 @@
                         string targetName = operandStrings[0];
 
                         // For calls, look up in function dictionary
-                        if (parsedOpcode == MaciOpcode.Call)
+                        if (parsedOpcode == MaciOpcode.Call || IsControlFlowCall(parsedOpcode))
                         {
                             if (input.FunctionNameToIndex.TryGetValue(targetName, out int index))
                             {
@@ -117,7 +117,17 @@
                    opcode == MaciOpcode.Je ||
                    opcode == MaciOpcode.Jne ||
                    opcode == MaciOpcode.Jg ||
-                   opcode == MaciOpcode.Jl;
+                   opcode == MaciOpcode.Jl ||
+                   IsControlFlowCall(opcode);
+        }
+
+        private static bool IsControlFlowCall(MaciOpcode opcode)
+        {
+            return opcode == MaciOpcode.Jmpf ||
+                   opcode == MaciOpcode.Jef ||
+                   opcode == MaciOpcode.Jnef ||
+                   opcode == MaciOpcode.Jgf ||
+                   opcode == MaciOpcode.Jlf;
         }
 
         private static MaciOperand[] ParseOperands(string[] operands)
