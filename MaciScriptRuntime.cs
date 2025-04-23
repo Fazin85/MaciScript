@@ -1,7 +1,6 @@
 ﻿namespace MaciScript
 {
-    //TODO: fix SysCallPrintLabel always printing first label
-    //TODO: stop functions from being excecuted in order regardless of whether or not they are called
+    //TODO: fix only one function call executing
 
     public static class MaciScriptRuntime
     {
