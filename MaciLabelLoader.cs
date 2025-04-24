@@ -8,9 +8,9 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> labelNameToIndex = [];
 
-        public bool TryLoad(string line, int instructionIndex, List<MaciLabel> labels)
+        public bool TryLoad(MaciCompilationData compilationData, string line, int instructionIndex, List<MaciLabel> labels)
         {
-            if (line.EndsWith(":"))
+            if (line.EndsWith(':'))
             {
                 string labelName = line[..^1].Trim();
                 foreach (var l in labels)
@@ -29,7 +29,7 @@ namespace MaciScript
 
                 // Store label info
                 labels.Add(label);
-                labelNameToIndex[label.Name] = labels.Count - 1;
+                labelNameToIndex[label.Name] = compilationData.LabelOffset + labels.Count - 1;
 
                 return true;
             }

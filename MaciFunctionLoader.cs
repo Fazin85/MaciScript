@@ -8,7 +8,7 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> functionNameToIndex = new(StringComparer.OrdinalIgnoreCase);
 
-        public bool TryLoad(string line, int instructionIndex, List<MaciFunction> functions)
+        public bool TryLoad(MaciCompilationData compilationData, string line, int instructionIndex, List<MaciFunction> functions)
         {
             if (line.StartsWith("function") && line.EndsWith(':'))
             {
@@ -22,7 +22,7 @@ namespace MaciScript
                 };
 
                 functions.Add(function);
-                functionNameToIndex[funcName] = functions.Count - 1;
+                functionNameToIndex[funcName] = compilationData.FunctionOffset + functions.Count - 1;
 
                 return true;
             }

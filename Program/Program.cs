@@ -41,18 +41,14 @@
             {
                 var files = ValidateFiles(args);
 
-                List<MaciCodeUnit> codeUnits = [];
+                List<string> sources = [];
 
                 foreach (var file in files)
                 {
-                    var source = File.ReadAllText(file);
-                    var codeUnit = MaciCodeUnit.FromString(source);
-
-                    codeUnits.Add(codeUnit);
+                    sources.Add(File.ReadAllText(file));
                 }
 
-                var runtimeData = new MaciRuntimeData();
-                runtimeData.AddCodeUnits(codeUnits);
+                var runtimeData = MaciCompiler.Compile([.. sources]);
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 

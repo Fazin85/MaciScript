@@ -8,7 +8,7 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> stringToIndex = new(StringComparer.OrdinalIgnoreCase);
 
-        public void TryLoad(int lineIndex, string line, List<string> strings, Dictionary<int, string> stringLines)
+        public void TryLoad(MaciCompilationData compilationData, int lineIndex, string line, List<string> strings, Dictionary<int, string> stringLines)
         {
             if (line.StartsWith("ldstr"))
             {
@@ -20,7 +20,7 @@ namespace MaciScript
                 }
 
                 strings.Add(strText);
-                stringToIndex[strText] = strings.Count - 1;
+                stringToIndex[strText] = compilationData.StringOffset + strings.Count - 1;
                 stringLines.Add(lineIndex, line);
             }
         }
