@@ -14,4 +14,13 @@ function clamp_set_min:
 function clamp_set_max:
 	mov R0, R2
 	ret
+
+function print_test:
+	ldstr R5 "Hello World!"
+	mov S1, R5
+	mov S0 4
+
+	syscall
+	
+	ret
 	

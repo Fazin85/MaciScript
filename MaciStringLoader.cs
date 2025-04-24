@@ -8,7 +8,7 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> stringToIndex = new(StringComparer.OrdinalIgnoreCase);
 
-        public void TryLoad(MaciCompilationData compilationData, int lineIndex, string line, List<string> strings, Dictionary<int, string> stringLines)
+        public void TryLoad(ref MaciCompilationData compilationData, int lineIndex, string line, List<string> strings, Dictionary<int, string> stringLines)
         {
             if (line.StartsWith("ldstr"))
             {

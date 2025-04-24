@@ -1,6 +1,6 @@
 ﻿namespace MaciScript
 {
-    public class MaciCodeUnit
+    public struct MaciCodeUnit
     {
         public required MaciFunction[] Functions;
         public required MaciLabel[] Labels;

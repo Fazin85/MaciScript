@@ -4,6 +4,8 @@ call hello_world
 
 call world_hello
 
+call print_test
+
 ; set the exit code to 0
 mov S1 0
 

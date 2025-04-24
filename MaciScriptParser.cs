@@ -22,7 +22,7 @@
 
                 MaciOpcode parsedOpcode = ParseOpcode(opcode);
 
-                bool isLdstrLine = input.StringLines.ContainsKey(input.LineNumber);
+                bool isLdstrLine = input.SymbolsCollections[input.SymbolCollectionIndex].StringLines.ContainsKey(input.LineNumber);
 
                 int operandCount = operandStrings.Length;
                 operandCount = Math.Clamp(operandCount, 1, 2);
@@ -46,11 +46,17 @@
                         // For calls, look up in function dictionary
                         if (parsedOpcode == MaciOpcode.Call || IsControlFlowCall(parsedOpcode))
                         {
-                            if (input.FunctionNameToIndex.TryGetValue(targetName, out int index))
+                            bool found = false;
+                            foreach (var symbolCollection in input.SymbolsCollections)
                             {
-                                instruction.Operands[0].Value = index;
+                                if (symbolCollection.FunctionNameToIndex.TryGetValue(targetName, out int index))
+                                {
+                                    instruction.Operands[0].Value = index;
+                                    found = true;
+                                }
                             }
-                            else
+
+                            if (!found)
                             {
                                 throw new Exception($"Function not found: {targetName}");
                             }
@@ -58,11 +64,17 @@
                         // For jumps, look up in label dictionary
                         else
                         {
-                            if (input.LabelNameToIndex.TryGetValue(targetName, out int index))
+                            bool found = false;
+                            foreach (var symbolCollection in input.SymbolsCollections)
                             {
-                                instruction.Operands[0].Value = index;
+                                if (symbolCollection.LabelNameToIndex.TryGetValue(targetName, out int index))
+                                {
+                                    instruction.Operands[0].Value = index;
+                                    found = true;
+                                }
                             }
-                            else
+
+                            if (!found)
                             {
                                 throw new Exception($"Label not found: {targetName}");
                             }
@@ -70,11 +82,11 @@
                     }
                     else if (parsedOpcode == MaciOpcode.Ldstr)
                     {
-                        if (input.StringLines.TryGetValue(input.LineNumber, out string? targetName))
+                        if (input.SymbolsCollections[input.SymbolCollectionIndex].StringLines.TryGetValue(input.LineNumber, out string? targetName))
                         {
                             targetName = Util.ExtractNestedQuotes(targetName) ?? throw new Exception("Failed to extract string from targetName");
 
-                            if (input.StringToIndex.TryGetValue(targetName, out int index))
+                            if (input.SymbolsCollections[input.SymbolCollectionIndex].StringToIndex.TryGetValue(targetName, out int index))
                             {
                                 if (!operandStrings[0].StartsWith("R", StringComparison.OrdinalIgnoreCase))
                                 {

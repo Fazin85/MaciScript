@@ -8,17 +8,15 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> labelNameToIndex = [];
 
-        public bool TryLoad(MaciCompilationData compilationData, string line, int instructionIndex, List<MaciLabel> labels)
+        public bool TryLoad(ref MaciCompilationData compilationData, List<MaciSymbolsCollection> existingSymbolCollections, string line, int instructionIndex, List<MaciLabel> labels)
         {
             if (line.EndsWith(':'))
             {
                 string labelName = line[..^1].Trim();
-                foreach (var l in labels)
+
+                if (existingSymbolCollections.Any(x => x.Labels.Any(y => y.Name == labelName)) || labels.Any(x => x.Name == labelName))
                 {
-                    if (labelName == l.Name)
-                    {
-                        throw new Exception("Cannot have duplicate labels: " + labelName);
-                    }
+                    throw new Exception($"Cannot have multiple labels with the same name: {labelName}");
                 }
 
                 var label = new MaciLabel

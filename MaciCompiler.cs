@@ -10,7 +10,7 @@
 
             foreach (var source in sources)
             {
-                symbolsCollections.Add(CollectSymbols(compilationData, source));
+                symbolsCollections.Add(CollectSymbols(ref compilationData, symbolsCollections, source));
             }
 
             List<MaciCodeUnit> codeUnits = [];
@@ -22,7 +22,7 @@
                     Functions = symbolsCollections[i].Functions,
                     Labels = symbolsCollections[i].Labels,
                     Strings = symbolsCollections[i].Strings,
-                    Instructions = CollectInstructions(symbolsCollections[i], compilationData, sources[i])
+                    Instructions = CollectInstructions(i, symbolsCollections, ref compilationData, sources[i])
                 });
             }
 
@@ -32,7 +32,7 @@
             return runtimeData;
         }
 
-        private static MaciSymbolsCollection CollectSymbols(MaciCompilationData compilationData, string source)
+        private static MaciSymbolsCollection CollectSymbols(ref MaciCompilationData compilationData, List<MaciSymbolsCollection> existingSymbolCollections, string source)
         {
             MaciFunctionLoader functionLoader = new();
             MaciStringLoader stringLoader = new();
@@ -56,14 +56,14 @@
 
                     if (string.IsNullOrWhiteSpace(line) ||
                         line.StartsWith(';') ||
-                        functionLoader.TryLoad(compilationData, line, instructionIndex, functions) ||
-                        labelLoader.TryLoad(compilationData, line, instructionIndex, labels)
+                        functionLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, functions) ||
+                        labelLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, labels)
                         )
                     {
                         continue;
                     }
 
-                    stringLoader.TryLoad(compilationData, i, line, strings, stringLines);
+                    stringLoader.TryLoad(ref compilationData, i, line, strings, stringLines);
 
                     instructionIndex++;
                     instructionCount++;
@@ -92,7 +92,7 @@
             }
         }
 
-        private static MaciInstruction[] CollectInstructions(MaciSymbolsCollection symbolsCollection, MaciCompilationData compilationData, string source)
+        private static MaciInstruction[] CollectInstructions(int symbolsIndex, List<MaciSymbolsCollection> symbolsCollections, ref MaciCompilationData compilationData, string source)
         {
             try
             {
@@ -108,13 +108,7 @@
                     if (string.IsNullOrWhiteSpace(line) || line.StartsWith(';') || line.EndsWith(':'))
                         continue;
 
-                    var parseInput = new MaciParseInput(
-                        symbolsCollection.FunctionNameToIndex,
-                        symbolsCollection.LabelNameToIndex,
-                        symbolsCollection.StringToIndex,
-                        symbolsCollection.StringLines,
-                        line,
-                        i);
+                    var parseInput = new MaciParseInput(symbolsIndex, symbolsCollections, line, i);
 
                     // Parse instruction
                     var instruction = MaciScriptParser.ParseInstruction(parseInput);
