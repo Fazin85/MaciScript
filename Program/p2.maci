@@ -21,6 +21,6 @@ function print_test:
 	mov S0 4
 
 	syscall
-	
+
 	ret
 	

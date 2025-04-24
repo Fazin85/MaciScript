@@ -2,27 +2,35 @@
 {
     public static class MaciCompiler
     {
-        public static MaciRuntimeData Compile(string[] sources)
+        public static MaciRuntimeData Compile(string[] filePaths)
         {
+            var files = ValidateFiles(filePaths);
+            var sources = new string[files.Count];
+
+            for (int i = 0; i < sources.Length; i++)
+            {
+                sources[i] = File.ReadAllText(files[i]);
+            }
+
             var compilationData = new MaciCompilationData();
 
-            List<MaciSymbolsCollection> symbolsCollections = [];
+            List<MaciSymbolCollection> symbolCollections = [];
 
-            foreach (var source in sources)
+            for (int i = 0; i < sources.Length; i++)
             {
-                symbolsCollections.Add(CollectSymbols(ref compilationData, symbolsCollections, source));
+                symbolCollections.Add(CollectSymbols(ref compilationData, symbolCollections, sources, filePaths, i));
             }
 
             List<MaciCodeUnit> codeUnits = [];
 
-            for (int i = 0; i < symbolsCollections.Count; i++)
+            for (int i = 0; i < symbolCollections.Count; i++)
             {
                 codeUnits.Add(new()
                 {
-                    Functions = symbolsCollections[i].Functions,
-                    Labels = symbolsCollections[i].Labels,
-                    Strings = symbolsCollections[i].Strings,
-                    Instructions = CollectInstructions(i, symbolsCollections, ref compilationData, sources[i])
+                    Functions = symbolCollections[i].Functions,
+                    Labels = symbolCollections[i].Labels,
+                    Strings = symbolCollections[i].Strings,
+                    Instructions = CollectInstructions(i, symbolCollections, sources[i])
                 });
             }
 
@@ -32,12 +40,42 @@
             return runtimeData;
         }
 
-        private static MaciSymbolsCollection CollectSymbols(ref MaciCompilationData compilationData, List<MaciSymbolsCollection> existingSymbolCollections, string source)
+        private static List<string> ValidateFiles(string[] filePaths)
+        {
+            if (filePaths == null || filePaths.Length == 0)
+            {
+                throw new ArgumentException("No files specified");
+            }
+
+            List<string> validFiles = [];
+
+            foreach (string filePath in filePaths)
+            {
+                if (File.Exists(filePath))
+                {
+                    validFiles.Add(filePath);
+                }
+                else
+                {
+                    throw new FileNotFoundException($"File not found: {filePath}");
+                }
+            }
+
+            return validFiles;
+        }
+
+        private static MaciSymbolCollection CollectSymbols(
+            ref MaciCompilationData compilationData,
+            List<MaciSymbolCollection> existingSymbolCollections,
+            string[] sources,
+            string[] sourceFilePaths,
+            int fileIndex)
         {
             MaciFunctionLoader functionLoader = new();
             MaciStringLoader stringLoader = new();
             MaciLabelLoader labelLoader = new();
 
+            List<string> imports = [];
             List<MaciFunction> functions = [];
             List<MaciLabel> labels = [];
             List<string> strings = [];
@@ -48,7 +86,7 @@
                 // First pass: collect all labels and function addresses
                 int instructionIndex = compilationData.InstructionIndex;
                 int instructionCount = 0;
-                var lines = source.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+                var lines = sources[fileIndex].Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
 
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -57,7 +95,8 @@
                     if (string.IsNullOrWhiteSpace(line) ||
                         line.StartsWith(';') ||
                         functionLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, functions) ||
-                        labelLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, labels)
+                        labelLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, labels) ||
+                        MaciImportLoader.TryLoad(line, sourceFilePaths, imports)
                         )
                     {
                         continue;
@@ -77,6 +116,8 @@
 
                 return new()
                 {
+                    FilePath = sourceFilePaths[fileIndex],
+                    Imports = [.. imports],
                     Functions = [.. functions],
                     Labels = [.. labels],
                     Strings = [.. strings],
@@ -92,23 +133,22 @@
             }
         }
 
-        private static MaciInstruction[] CollectInstructions(int symbolsIndex, List<MaciSymbolsCollection> symbolsCollections, ref MaciCompilationData compilationData, string source)
+        private static MaciInstruction[] CollectInstructions(int symbolsIndex, List<MaciSymbolCollection> symbolCollections, string source)
         {
             try
             {
                 var lines = source.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
                 List<MaciInstruction> instructions = [];
 
-                // Second pass: parse instructions
                 for (int i = 0; i < lines.Length; i++)
                 {
                     string line = lines[i].Trim();
 
                     // Skip labels, comments, and empty lines
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(';') || line.EndsWith(':'))
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith(';') || line.EndsWith(':') || line.StartsWith("import"))
                         continue;
 
-                    var parseInput = new MaciParseInput(symbolsIndex, symbolsCollections, line, i);
+                    var parseInput = new MaciParseInput(symbolsIndex, symbolCollections, line, i);
 
                     // Parse instruction
                     var instruction = MaciScriptParser.ParseInstruction(parseInput);

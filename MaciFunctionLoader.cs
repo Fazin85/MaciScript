@@ -8,7 +8,7 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> functionNameToIndex = new(StringComparer.OrdinalIgnoreCase);
 
-        public bool TryLoad(ref MaciCompilationData compilationData, List<MaciSymbolsCollection> existingSymbolCollections, string line, int instructionIndex, List<MaciFunction> functions)
+        public bool TryLoad(ref MaciCompilationData compilationData, List<MaciSymbolCollection> existingSymbolCollections, string line, int instructionIndex, List<MaciFunction> functions)
         {
             if (line.StartsWith("function") && line.EndsWith(':'))
             {

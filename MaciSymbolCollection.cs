@@ -2,8 +2,10 @@
 
 namespace MaciScript
 {
-    public class MaciSymbolsCollection
+    public class MaciSymbolCollection
     {
+        public required string FilePath;
+        public required string[] Imports;
         public required MaciFunction[] Functions;
         public required MaciLabel[] Labels;
         public required string[] Strings;

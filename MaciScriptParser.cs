@@ -2,10 +2,17 @@
 {
     public static class MaciScriptParser
     {
+        private static bool CanSymbolCollectionBeUsed(MaciSymbolCollection current, MaciSymbolCollection other)
+        {
+            return current.Imports.Contains(other.FilePath) || other == current;
+        }
+
         public static MaciInstruction ParseInstruction(MaciParseInput input)
         {
             try
             {
+                MaciSymbolCollection currentSymbols = input.SymbolCollections[input.SymbolCollectionIndex];
+
                 // Remove comments
                 int commentIndex = input.Line.IndexOf(';');
                 if (commentIndex >= 0)
@@ -22,7 +29,7 @@
 
                 MaciOpcode parsedOpcode = ParseOpcode(opcode);
 
-                bool isLdstrLine = input.SymbolsCollections[input.SymbolCollectionIndex].StringLines.ContainsKey(input.LineNumber);
+                bool isLdstrLine = currentSymbols.StringLines.ContainsKey(input.LineNumber);
 
                 int operandCount = operandStrings.Length;
                 operandCount = Math.Clamp(operandCount, 1, 2);
@@ -47,7 +54,7 @@
                         if (parsedOpcode == MaciOpcode.Call || IsControlFlowCall(parsedOpcode))
                         {
                             bool found = false;
-                            foreach (var symbolCollection in input.SymbolsCollections)
+                            foreach (var symbolCollection in input.SymbolCollections.Where(x => CanSymbolCollectionBeUsed(currentSymbols, x)))
                             {
                                 if (symbolCollection.FunctionNameToIndex.TryGetValue(targetName, out int index))
                                 {
@@ -65,7 +72,7 @@
                         else
                         {
                             bool found = false;
-                            foreach (var symbolCollection in input.SymbolsCollections)
+                            foreach (var symbolCollection in input.SymbolCollections.Where(x => CanSymbolCollectionBeUsed(currentSymbols, x)))
                             {
                                 if (symbolCollection.LabelNameToIndex.TryGetValue(targetName, out int index))
                                 {
@@ -82,11 +89,11 @@
                     }
                     else if (parsedOpcode == MaciOpcode.Ldstr)
                     {
-                        if (input.SymbolsCollections[input.SymbolCollectionIndex].StringLines.TryGetValue(input.LineNumber, out string? targetName))
+                        if (currentSymbols.StringLines.TryGetValue(input.LineNumber, out string? targetName))
                         {
                             targetName = Util.ExtractNestedQuotes(targetName) ?? throw new Exception("Failed to extract string from targetName");
 
-                            if (input.SymbolsCollections[input.SymbolCollectionIndex].StringToIndex.TryGetValue(targetName, out int index))
+                            if (currentSymbols.StringToIndex.TryGetValue(targetName, out int index))
                             {
                                 if (!operandStrings[0].StartsWith("R", StringComparison.OrdinalIgnoreCase))
                                 {

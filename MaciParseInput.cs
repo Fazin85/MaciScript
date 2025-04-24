@@ -1,9 +1,9 @@
 ﻿namespace MaciScript
 {
-    public class MaciParseInput(int symbolCollectionIndex, List<MaciSymbolsCollection> symbolsCollections, string line, int lineNumber)
+    public class MaciParseInput(int symbolCollectionIndex, List<MaciSymbolCollection> symbolCollections, string line, int lineNumber)
     {
         public int SymbolCollectionIndex = symbolCollectionIndex;
-        public List<MaciSymbolsCollection> SymbolsCollections = symbolsCollections;
+        public List<MaciSymbolCollection> SymbolCollections = symbolCollections;
         public string Line = line;
         public int LineNumber = lineNumber;
     }

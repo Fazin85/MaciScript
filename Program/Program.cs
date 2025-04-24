@@ -5,29 +5,7 @@
     /// </summary>
     class Program
     {
-        public static List<string> ValidateFiles(string[] args)
-        {
-            if (args == null || args.Length == 0)
-            {
-                throw new ArgumentException("No files specified");
-            }
 
-            List<string> validFiles = [];
-
-            foreach (string filePath in args)
-            {
-                if (File.Exists(filePath))
-                {
-                    validFiles.Add(filePath);
-                }
-                else
-                {
-                    throw new FileNotFoundException($"File not found: {filePath}");
-                }
-            }
-
-            return validFiles;
-        }
 
         static void Main(string[] args)
         {
@@ -39,16 +17,7 @@
 
             try
             {
-                var files = ValidateFiles(args);
-
-                List<string> sources = [];
-
-                foreach (var file in files)
-                {
-                    sources.Add(File.ReadAllText(file));
-                }
-
-                var runtimeData = MaciCompiler.Compile([.. sources]);
+                var runtimeData = MaciCompiler.Compile(args);
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 

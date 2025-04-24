@@ -8,7 +8,7 @@ namespace MaciScript
 
         private readonly Dictionary<string, int> labelNameToIndex = [];
 
-        public bool TryLoad(ref MaciCompilationData compilationData, List<MaciSymbolsCollection> existingSymbolCollections, string line, int instructionIndex, List<MaciLabel> labels)
+        public bool TryLoad(ref MaciCompilationData compilationData, List<MaciSymbolCollection> existingSymbolCollections, string line, int instructionIndex, List<MaciLabel> labels)
         {
             if (line.EndsWith(':'))
             {
