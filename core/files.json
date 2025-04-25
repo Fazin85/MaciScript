@@ -1,4 +1,5 @@
 [
-  "core/mem.maci"
+  "core/sys.maci",
+  "core/string.maci"
 
 ]

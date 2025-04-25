@@ -1,0 +1,12 @@
+; input: string literal, eg "Hello World!"
+; modifies R0, S0, S1
+
+macro print(string) {
+	ldstr R0 string
+	
+	mov S1 R0
+	
+	mov S0 4
+	
+	syscall
+}

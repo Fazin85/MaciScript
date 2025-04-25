@@ -11,6 +11,8 @@
             var coreLib = MaciCoreLibraryLoader.GetFilePaths();
 
             filePaths.AddRange(userFilePaths);
+
+            // we must add core lib after user code or the interpreter will get fucked up
             filePaths.AddRange(coreLib);
 
             return [.. filePaths];
@@ -26,8 +28,6 @@
 
             try
             {
-                var compiler = new MaciCompiler();
-
                 var runtimeData = MaciCompiler.Compile(GetFiles(args));
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());

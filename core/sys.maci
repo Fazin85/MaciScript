@@ -1,0 +1,35 @@
+; modifies R0, S0, S1
+; output stored in R0
+macro alloc(size) {
+	mov S1 size
+	mov S0 5
+
+	syscall
+}
+
+; modifies R0, S0, S1, S2
+; output stored in R0
+macro realloc(ptr, size) {
+	mov S1 ptr
+	mov S2 size
+
+	mov S0 6
+
+	syscall
+}
+
+; modifies S0, S1
+macro free(ptr) {
+	mov S0 7
+	mov S1 ptr
+
+	syscall
+}
+
+; modifies S0, S1
+macro exit(exit_code) {
+	mov S1 exit_code
+	mov S0 3
+
+	syscall
+}

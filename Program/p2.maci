@@ -1,5 +1,3 @@
-import core/mem.maci
-
 function clamp:
 	cmp R0 R1
 	jlf clamp_set_min

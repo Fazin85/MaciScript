@@ -2,6 +2,8 @@
 {
     public class MaciCompiler()
     {
+        public static bool LogExpandedSource = false;
+
         public static MaciRuntimeData Compile(string[] filePaths)
         {
             MaciInputFileData[] fileData = new MaciInputFileData[filePaths.Length];
@@ -18,6 +20,17 @@
         public static MaciRuntimeData Compile(MaciInputFileData[] inputFileData)
         {
             ProcessMacros(inputFileData);
+
+            if (LogExpandedSource)
+            {
+                Console.WriteLine("Expanded source files:");
+
+                foreach (var file in inputFileData)
+                {
+                    Console.WriteLine($"file path: {file.FilePath}");
+                    Console.WriteLine(file.FileContent);
+                }
+            }
 
             var filePaths = inputFileData.Select(x => x.FilePath).ToArray();
             var sources = inputFileData.Select(x => x.FileContent).ToArray();
