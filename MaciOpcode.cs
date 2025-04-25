@@ -39,6 +39,8 @@
 
         // System
         Syscall,
-        Ldstr
+        Ldstr,
+        Push,
+        Pop
     }
 }

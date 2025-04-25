@@ -28,6 +28,8 @@
 
             try
             {
+                MaciCompiler.LogExpandedSource = true;
+                
                 var runtimeData = MaciCompiler.Compile(GetFiles(args));
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());

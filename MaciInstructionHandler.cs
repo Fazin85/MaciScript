@@ -379,6 +379,17 @@
                             runtimeData.Registers[instruction.Operands[0].Value] = instruction.Operands[1].Value;
                         }
                         break;
+                    case MaciOpcode.Push:
+                        {
+                            runtimeData.CallStack.Push(instruction.Operands[0].Value);
+                        }
+                        break;
+                    case MaciOpcode.Pop:
+                        {
+                            int register = instruction.Operands[0].Value;
+                            runtimeData.Registers[register] = runtimeData.CallStack.Pop();
+                        }
+                        break;
                     default:
                         throw new Exception($"Unknown opcode: {instruction.Opcode}");
                 }

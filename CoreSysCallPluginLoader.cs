@@ -200,6 +200,21 @@
             }
         }
 
+        private class SysCallGetVar(MaciStackVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciStackVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 16;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string varName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+                int register = runtimeData.SystemRegisters[2];
+                runtimeData.Registers[register] = variableAllocator.GetVariable(varName);
+                Console.WriteLine($"get var: {runtimeData.Registers[register]}");
+            }
+        }
+
         public SysCallPlugin Load()
         {
             List<SysCall> sysCalls =
@@ -218,7 +233,8 @@
                 new SysCallPushScope(stackVariableAllocator),
                 new SysCallPushVar(stackVariableAllocator),
                 new SysCallSetVar(stackVariableAllocator),
-                new SysCallPopScope(stackVariableAllocator)
+                new SysCallPopScope(stackVariableAllocator),
+                new SysCallGetVar(stackVariableAllocator)
             ];
 
             return new SysCallPlugin(sysCalls, "core");

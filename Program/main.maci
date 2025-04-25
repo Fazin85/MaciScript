@@ -26,6 +26,8 @@ push_scope()
 	push_scope()
 		push_var("y")
 		set_var("x", 512)
+
+		get_var("x", R1)
 	pop_scope()
 pop_scope()
 

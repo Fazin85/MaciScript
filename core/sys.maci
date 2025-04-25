@@ -1,5 +1,3 @@
-; modifies R0, S0, S1
-; output stored in R0
 macro alloc(size) {
 	mov S1 size
 	mov S0 5
@@ -7,8 +5,6 @@ macro alloc(size) {
 	syscall
 }
 
-; modifies R0, S0, S1, S2
-; output stored in R0
 macro realloc(ptr, size) {
 	mov S1 ptr
 	mov S2 size
@@ -18,7 +14,6 @@ macro realloc(ptr, size) {
 	syscall
 }
 
-; modifies S0, S1
 macro free(ptr) {
 	mov S0 7
 	mov S1 ptr
@@ -26,7 +21,6 @@ macro free(ptr) {
 	syscall
 }
 
-; modifies S0, S1
 macro exit(exit_code) {
 	mov S1 exit_code
 	mov S0 3
@@ -34,36 +28,39 @@ macro exit(exit_code) {
 	syscall
 }
 
-; modifies R0, S0, S1
 macro alloc_named_scope(name) {
-	ldstr R0 name
-
-	mov S1 R0
+	push R0
+		ldstr R0 name
+		mov S1 R0
+	pop R0
+	
 	mov S0 8
 
 	syscall
 }
 
-; modifies R0, S0, S1, S2
 macro alloc_var(scope_name, var_name) {
-	ldstr R0 scope_name
-	mov S1 R0
+	push R0
+		ldstr R0 scope_name
+		mov S1 R0
 
-	ldstr R0 var_name
-	mov S2 R0
+		ldstr R0 var_name
+		mov S2 R0
+	pop R0
 
 	mov S0 9
 
 	syscall
 }
 
-; modifies R0, S0, S1, S2, S3
 macro set_scope_var(scope_name, var_name, value) {
-	ldstr R0 scope_name
-	mov S1 R0
+	push R0
+		ldstr R0 scope_name
+		mov S1 R0
 
-	ldstr R0 var_name
-	mov S2 R0
+		ldstr R0 var_name
+		mov S2 R0
+	pop R0
 
 	mov S3 value
 
@@ -72,37 +69,39 @@ macro set_scope_var(scope_name, var_name, value) {
 	syscall
 }
 
-; modifies R0, S0, S1
 macro free_named_scope(name) {
-	ldstr R0 name
-	mov S1 R0
-	
+	push R0
+		ldstr R0 name
+		mov S1 R0
+	pop R0
+
 	mov S0 11
 
 	syscall
 }
 
-; modifies S0
 macro push_scope() {
 	mov S0 12
 
 	syscall
 }
 
-; modifies R0, S0, S1
 macro push_var(name) {
-	ldstr R0 name
-	mov S1 R0
-	
+	push R0
+		ldstr R0 name
+		mov S1 R0
+	pop R0
+
 	mov S0 13
 
 	syscall
 }
 
-; modifies R0, S0, S1, S2
 macro set_var(name, value) {
-	ldstr R0 name
-	mov S1 R0
+	push R0
+		ldstr R0 name
+		mov S1 R0
+	pop R0
 
 	mov S2 value
 
@@ -111,7 +110,19 @@ macro set_var(name, value) {
 	syscall
 }
 
-; modifies S0
+macro get_var(name, out_reg) {
+	push R0
+		ldstr R0 name
+		mov S1 R0
+	pop R0
+
+	mov S2 out_reg
+
+	mov S0 16
+	
+	syscall
+}
+
 macro pop_scope() {
 	mov S0 15
 
