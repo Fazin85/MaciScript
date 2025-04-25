@@ -33,3 +33,87 @@ macro exit(exit_code) {
 
 	syscall
 }
+
+; modifies R0, S0, S1
+macro alloc_named_scope(name) {
+	ldstr R0 name
+
+	mov S1 R0
+	mov S0 8
+
+	syscall
+}
+
+; modifies R0, S0, S1, S2
+macro alloc_var(scope_name, var_name) {
+	ldstr R0 scope_name
+	mov S1 R0
+
+	ldstr R0 var_name
+	mov S2 R0
+
+	mov S0 9
+
+	syscall
+}
+
+; modifies R0, S0, S1, S2, S3
+macro set_scope_var(scope_name, var_name, value) {
+	ldstr R0 scope_name
+	mov S1 R0
+
+	ldstr R0 var_name
+	mov S2 R0
+
+	mov S3 value
+
+	mov S0 10
+
+	syscall
+}
+
+; modifies R0, S0, S1
+macro free_named_scope(name) {
+	ldstr R0 name
+	mov S1 R0
+	
+	mov S0 11
+
+	syscall
+}
+
+; modifies S0
+macro push_scope() {
+	mov S0 12
+
+	syscall
+}
+
+; modifies R0, S0, S1
+macro push_var(name) {
+	ldstr R0 name
+	mov S1 R0
+	
+	mov S0 13
+
+	syscall
+}
+
+; modifies R0, S0, S1, S2
+macro set_var(name, value) {
+	ldstr R0 name
+	mov S1 R0
+
+	mov S2 value
+
+	mov S0 14
+
+	syscall
+}
+
+; modifies S0
+macro pop_scope() {
+	mov S0 15
+
+	syscall
+}

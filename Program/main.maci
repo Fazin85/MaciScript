@@ -12,6 +12,23 @@ alloc(128)
 realloc(R0, 256)
 free(R0)
 
+alloc_named_scope("scope")
+
+alloc_var("scope", "x")
+set_scope_var("scope", "x", 10)
+
+free_named_scope("scope")
+
+push_scope()
+	push_var("x")
+	set_var("x", 256)
+
+	push_scope()
+		push_var("y")
+		set_var("x", 512)
+	pop_scope()
+pop_scope()
+
 ; exit macro
 
 exit(0)

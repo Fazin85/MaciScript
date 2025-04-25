@@ -32,6 +32,7 @@ namespace MaciScript
                     List<string> parameters = parametersStr
                         .Split(',')
                         .Select(p => p.Trim())
+                        .Where(p => !string.IsNullOrEmpty(p))
                         .ToList();
 
                     List<string> bodyLines = body
@@ -138,7 +139,7 @@ namespace MaciScript
                 else if (c == ',' && parDepth == 0)
                 {
                     // Found a top-level comma, split here
-                    args.Add(argsString.Substring(lastSplit, i - lastSplit).Trim());
+                    args.Add(argsString[lastSplit..i].Trim());
                     lastSplit = i + 1;
                 }
             }
@@ -146,7 +147,7 @@ namespace MaciScript
             // Add the last argument
             if (lastSplit < argsString.Length)
             {
-                args.Add(argsString.Substring(lastSplit).Trim());
+                args.Add(argsString[lastSplit..].Trim());
             }
 
             return args;

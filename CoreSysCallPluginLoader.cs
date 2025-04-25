@@ -3,6 +3,8 @@
     public class CoreSysCallPluginLoader(IMaciMemoryAllocator memoryAllocator) : IMaciScriptSysCallPluginLoader
     {
         private readonly IMaciMemoryAllocator memoryAllocator = memoryAllocator;
+        private readonly MaciNamedScopeVariableAllocator namedScopeVariableAllocator = new();
+        private readonly MaciStackVariableAllocator stackVariableAllocator = new();
 
         private class SysCallPrintInt : SysCall
         {
@@ -59,7 +61,6 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 runtimeData.Registers[0] = memoryAllocator.Alloc(runtimeData.SystemRegisters[1]);
-                Console.WriteLine("alloc");
             }
         }
 
@@ -72,7 +73,6 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 runtimeData.Registers[0] = memoryAllocator.Realloc(runtimeData.SystemRegisters[1], runtimeData.SystemRegisters[2]);
-                Console.WriteLine("realloc");
             }
         }
 
@@ -85,20 +85,141 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 memoryAllocator.Free(runtimeData.SystemRegisters[1]);
-                Console.WriteLine("free");
+            }
+        }
+
+        private class SysCallAllocNamedScope(MaciNamedScopeVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciNamedScopeVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 8;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string scopeName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+
+                variableAllocator.AllocateScope(scopeName);
+            }
+        }
+
+        private class SysCallAllocVariable(MaciNamedScopeVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciNamedScopeVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 9;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string scopeName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+                string variableName = runtimeData.Strings[runtimeData.SystemRegisters[2]];
+
+                variableAllocator.AllocateVariable(scopeName, variableName);
+            }
+        }
+
+        private class SysCallSetScopedVariable(MaciNamedScopeVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciNamedScopeVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 10;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string scopeName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+                string variableName = runtimeData.Strings[runtimeData.SystemRegisters[2]];
+                int value = runtimeData.SystemRegisters[3];
+
+                variableAllocator.SetVariable(scopeName, variableName, value);
+            }
+        }
+
+        private class SysCallFreeNamedScope(MaciNamedScopeVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciNamedScopeVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 11;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string scopeName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+
+                variableAllocator.FreeScope(scopeName);
+            }
+        }
+
+        private class SysCallPushScope(MaciStackVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciStackVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 12;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                variableAllocator.PushScope();
+            }
+        }
+
+        private class SysCallPushVar(MaciStackVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciStackVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 13;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string variableName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+
+                variableAllocator.AllocateVariable(variableName);
+            }
+        }
+
+        private class SysCallSetVar(MaciStackVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciStackVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 14;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                string variableName = runtimeData.Strings[runtimeData.SystemRegisters[1]];
+                int value = runtimeData.SystemRegisters[2];
+
+                variableAllocator.SetVariable(variableName, value);
+            }
+        }
+
+        private class SysCallPopScope(MaciStackVariableAllocator variableAllocator) : SysCall
+        {
+            private readonly MaciStackVariableAllocator variableAllocator = variableAllocator;
+
+            public override int ID => 15;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                variableAllocator.PopScope();
             }
         }
 
         public SysCallPlugin Load()
         {
-            List<SysCall> sysCalls = [
+            List<SysCall> sysCalls =
+            [
                 new SysCallPrintInt(),
                 new SysCallPrintString(),
                 new SysCallExit(),
                 new SysCallPrintStringByIndex(),
                 new SysCallAlloc(memoryAllocator),
                 new SysCallRealloc(memoryAllocator),
-                new SysCallFree(memoryAllocator)];
+                new SysCallFree(memoryAllocator),
+                new SysCallAllocNamedScope(namedScopeVariableAllocator),
+                new SysCallAllocVariable(namedScopeVariableAllocator),
+                new SysCallSetScopedVariable(namedScopeVariableAllocator),
+                new SysCallFreeNamedScope(namedScopeVariableAllocator),
+                new SysCallPushScope(stackVariableAllocator),
+                new SysCallPushVar(stackVariableAllocator),
+                new SysCallSetVar(stackVariableAllocator),
+                new SysCallPopScope(stackVariableAllocator)
+            ];
 
             return new SysCallPlugin(sysCalls, "core");
         }
