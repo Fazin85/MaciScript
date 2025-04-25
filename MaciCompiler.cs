@@ -2,7 +2,7 @@
 {
     public class MaciCompiler()
     {
-        public MaciRuntimeData Compile(string[] filePaths)
+        public static MaciRuntimeData Compile(string[] filePaths)
         {
             MaciInputFileData[] fileData = new MaciInputFileData[filePaths.Length];
 
@@ -15,8 +15,10 @@
             return Compile(fileData);
         }
 
-        public MaciRuntimeData Compile(MaciInputFileData[] inputFileData)
+        public static MaciRuntimeData Compile(MaciInputFileData[] inputFileData)
         {
+            ProcessMacros(inputFileData);
+
             var filePaths = inputFileData.Select(x => x.FilePath).ToArray();
             var sources = inputFileData.Select(x => x.FileContent).ToArray();
 
@@ -45,6 +47,19 @@
             runtimeData.AddCodeUnits(codeUnits);
 
             return runtimeData;
+        }
+
+        private static void ProcessMacros(MaciInputFileData[] inputFileData)
+        {
+            var macroProcessor = new MaciMacroProcessor();
+
+            macroProcessor.CollectMacroDefinitions(inputFileData);
+            var expandedFileContent = macroProcessor.ExpandMacros(inputFileData);
+
+            for (int i = 0; i < expandedFileContent.Length; i++)
+            {
+                inputFileData[i].FileContent = expandedFileContent[i];
+            }
         }
 
         private static MaciSymbolCollection CollectSymbols(

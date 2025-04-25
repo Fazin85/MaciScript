@@ -35,3 +35,20 @@ function free:
 	syscall
 
 	ret
+
+macro my_nested_macro(var1, var2) {
+	mov var2 var1
+
+	syscall
+}
+
+macro my_macro(var1, var2, var3) {
+	mov var1 var2
+	mov S1 var3
+
+	syscall
+
+	my_nested_macro(var1, var2)
+}
+
+my_macro(R1, R2, 5)

@@ -28,7 +28,7 @@
             {
                 var compiler = new MaciCompiler();
 
-                var runtimeData = compiler.Compile(GetFiles(args));
+                var runtimeData = MaciCompiler.Compile(GetFiles(args));
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 
