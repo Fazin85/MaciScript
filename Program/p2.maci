@@ -1,3 +1,5 @@
+import core/mem.maci
+
 function clamp:
 	cmp R0 R1
 	jlf clamp_set_min
@@ -19,31 +21,6 @@ function print_test:
 	ldstr R5 "Hello World!"
 	mov S1 R5
 	mov S0 4
-
-	syscall
-
-	ret
-
-function alloc_test:
-	; size: 128 bytes
-	mov S1 128
-	
-	; 5 for alloc
-	mov S0 5
-
-	syscall
-
-	; output is in R0
-
-	ret
-
-function free_test:
-	
-	; move the pointer to the memory into S1
-	mov S1 R0
-	
-	; 7 for free
-	mov S0 7
 
 	syscall
 

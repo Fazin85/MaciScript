@@ -9,9 +9,6 @@ call world_hello
 ; imported from p2.maci
 call print_test
 
-call alloc_test
-call free_test
-
 ; set the exit code to 0
 mov S1 0
 

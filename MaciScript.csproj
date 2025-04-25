@@ -17,4 +17,13 @@
     <None Remove="Program\obj\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="core\files.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="core\mem.maci">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,7 @@
 ﻿namespace MaciScript
 {
-    public class MaciCompiler(MaciCompilerSettings settings)
+    public class MaciCompiler()
     {
-        private MaciCompilerSettings settings = settings;
-
         public MaciRuntimeData Compile(string[] filePaths)
         {
             MaciInputFileData[] fileData = new MaciInputFileData[filePaths.Length];

@@ -59,6 +59,7 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 runtimeData.Registers[0] = memoryAllocator.Alloc(runtimeData.SystemRegisters[1]);
+                Console.WriteLine("alloc");
             }
         }
 
@@ -71,6 +72,7 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 runtimeData.Registers[0] = memoryAllocator.Realloc(runtimeData.SystemRegisters[1], runtimeData.SystemRegisters[2]);
+                Console.WriteLine("realloc");
             }
         }
 
@@ -83,6 +85,7 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 memoryAllocator.Free(runtimeData.SystemRegisters[1]);
+                Console.WriteLine("free");
             }
         }
 

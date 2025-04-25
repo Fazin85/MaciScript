@@ -5,7 +5,16 @@
     /// </summary>
     class Program
     {
+        private static string[] GetFiles(string[] userFilePaths)
+        {
+            List<string> filePaths = [];
+            var coreLib = MaciCoreLibraryLoader.GetFilePaths();
 
+            filePaths.AddRange(userFilePaths);
+            filePaths.AddRange(coreLib);
+
+            return [.. filePaths];
+        }
 
         static void Main(string[] args)
         {
@@ -17,9 +26,9 @@
 
             try
             {
-                var compiler = new MaciCompiler(new MaciCompilerSettings());
+                var compiler = new MaciCompiler();
 
-                var runtimeData = compiler.Compile(args);
+                var runtimeData = compiler.Compile(GetFiles(args));
 
                 var syscallExcecutor = new SysCallExecutor(new SysCallLoaderPlugins());
 

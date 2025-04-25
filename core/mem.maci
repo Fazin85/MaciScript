@@ -1,7 +1,37 @@
 ; size: R0
 ; output ptr: R0
 ; runtime will crash if memory allocation fails
-function malloc:
+function alloc:
+	
+	mov S1 R0
+	mov S0 5
+
+	syscall
+
+	ret
+
+; existing ptr: R0
+; new size: R1
+; output ptr: R0
+; runtime will crash if memory allocation fails
+function realloc:
+	
+	mov S1 R0
+	mov S2 R1
+
+	mov S0 6
+
+	syscall
 	
 	ret
+
+; ptr: R0
+function free:
 	
+	mov S0 7
+
+	mov S1 R0
+
+	syscall
+
+	ret
