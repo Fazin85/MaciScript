@@ -1,0 +1,7 @@
+; size: R0
+; output ptr: R0
+; runtime will crash if memory allocation fails
+function malloc:
+	
+	ret
+	

@@ -10,7 +10,7 @@ namespace MaciScript
 
         public SysCallLoaderPlugins()
         {
-            RegisterPlugin(new CoreSysCallPluginLoader());
+            RegisterPlugin(new CoreSysCallPluginLoader(new MaciMemoryAllocatorList()));
         }
 
         public void RegisterPlugin(IMaciScriptSysCallPluginLoader pluginLoader)

@@ -1,24 +1,49 @@
 function clamp:
-	cmp R0, R1
+	cmp R0 R1
 	jlf clamp_set_min
 
-	cmp R0, R2
+	cmp R0 R2
 	jgf clamp_set_max
 
 	ret
 
 function clamp_set_min:
-	mov R0, R1
+	mov R0 R1
 	ret
 
 function clamp_set_max:
-	mov R0, R2
+	mov R0 R2
 	ret
 
 function print_test:
 	ldstr R5 "Hello World!"
-	mov S1, R5
+	mov S1 R5
 	mov S0 4
+
+	syscall
+
+	ret
+
+function alloc_test:
+	; size: 128 bytes
+	mov S1 128
+	
+	; 5 for alloc
+	mov S0 5
+
+	syscall
+
+	; output is in R0
+
+	ret
+
+function free_test:
+	
+	; move the pointer to the memory into S1
+	mov S1 R0
+	
+	; 7 for free
+	mov S0 7
 
 	syscall
 

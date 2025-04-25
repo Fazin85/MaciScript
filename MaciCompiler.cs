@@ -1,19 +1,28 @@
 ﻿namespace MaciScript
 {
-    public static class MaciCompiler
+    public class MaciCompiler(MaciCompilerSettings settings)
     {
-        public static MaciRuntimeData Compile(string[] filePaths)
-        {
-            var files = ValidateFiles(filePaths);
-            var sources = new string[files.Count];
+        private MaciCompilerSettings settings = settings;
 
-            for (int i = 0; i < sources.Length; i++)
+        public MaciRuntimeData Compile(string[] filePaths)
+        {
+            MaciInputFileData[] fileData = new MaciInputFileData[filePaths.Length];
+
+            for (int i = 0; i < fileData.Length; i++)
             {
-                sources[i] = File.ReadAllText(files[i]);
+                fileData[i].FilePath = filePaths[i];
+                fileData[i].FileContent = File.ReadAllText(filePaths[i]);
             }
 
-            var compilationData = new MaciCompilationData();
+            return Compile(fileData);
+        }
 
+        public MaciRuntimeData Compile(MaciInputFileData[] inputFileData)
+        {
+            var filePaths = inputFileData.Select(x => x.FilePath).ToArray();
+            var sources = inputFileData.Select(x => x.FileContent).ToArray();
+
+            var compilationData = new MaciCompilationData();
             List<MaciSymbolCollection> symbolCollections = [];
 
             for (int i = 0; i < sources.Length; i++)
@@ -38,30 +47,6 @@
             runtimeData.AddCodeUnits(codeUnits);
 
             return runtimeData;
-        }
-
-        private static List<string> ValidateFiles(string[] filePaths)
-        {
-            if (filePaths == null || filePaths.Length == 0)
-            {
-                throw new ArgumentException("No files specified");
-            }
-
-            List<string> validFiles = [];
-
-            foreach (string filePath in filePaths)
-            {
-                if (File.Exists(filePath))
-                {
-                    validFiles.Add(filePath);
-                }
-                else
-                {
-                    throw new FileNotFoundException($"File not found: {filePath}");
-                }
-            }
-
-            return validFiles;
         }
 
         private static MaciSymbolCollection CollectSymbols(
@@ -92,6 +77,7 @@
                 {
                     string line = lines[i].Trim();
 
+                    //I should probably abstract this loader mess but idc
                     if (string.IsNullOrWhiteSpace(line) ||
                         line.StartsWith(';') ||
                         functionLoader.TryLoad(ref compilationData, existingSymbolCollections, line, instructionIndex, functions) ||
@@ -148,11 +134,7 @@
                     if (string.IsNullOrWhiteSpace(line) || line.StartsWith(';') || line.EndsWith(':') || line.StartsWith("import"))
                         continue;
 
-                    var parseInput = new MaciParseInput(symbolsIndex, symbolCollections, line, i);
-
-                    // Parse instruction
-                    var instruction = MaciScriptParser.ParseInstruction(parseInput);
-                    instructions.Add(instruction);
+                    instructions.Add(MaciScriptParser.ParseInstruction(new(symbolsIndex, symbolCollections, line, i)));
                 }
 
                 return [.. instructions];

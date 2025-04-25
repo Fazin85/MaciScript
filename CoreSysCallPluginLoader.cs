@@ -1,7 +1,9 @@
 ﻿namespace MaciScript
 {
-    public class CoreSysCallPluginLoader : IMaciScriptSysCallPluginLoader
+    public class CoreSysCallPluginLoader(IMaciMemoryAllocator memoryAllocator) : IMaciScriptSysCallPluginLoader
     {
+        private readonly IMaciMemoryAllocator memoryAllocator = memoryAllocator;
+
         private class SysCallPrintInt : SysCall
         {
             public override int ID => 1;
@@ -48,13 +50,52 @@
             }
         }
 
+        private class SysCallAlloc(IMaciMemoryAllocator memoryAllocator) : SysCall
+        {
+            private readonly IMaciMemoryAllocator memoryAllocator = memoryAllocator;
+
+            public override int ID => 5;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                runtimeData.Registers[0] = memoryAllocator.Alloc(runtimeData.SystemRegisters[1]);
+            }
+        }
+
+        private class SysCallRealloc(IMaciMemoryAllocator memoryAllocator) : SysCall
+        {
+            private readonly IMaciMemoryAllocator memoryAllocator = memoryAllocator;
+
+            public override int ID => 6;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                runtimeData.Registers[0] = memoryAllocator.Realloc(runtimeData.SystemRegisters[1], runtimeData.SystemRegisters[2]);
+            }
+        }
+
+        private class SysCallFree(IMaciMemoryAllocator memoryAllocator) : SysCall
+        {
+            private readonly IMaciMemoryAllocator memoryAllocator = memoryAllocator;
+
+            public override int ID => 7;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                memoryAllocator.Free(runtimeData.SystemRegisters[1]);
+            }
+        }
+
         public SysCallPlugin Load()
         {
             List<SysCall> sysCalls = [
                 new SysCallPrintInt(),
                 new SysCallPrintString(),
                 new SysCallExit(),
-                new SysCallPrintStringByIndex()];
+                new SysCallPrintStringByIndex(),
+                new SysCallAlloc(memoryAllocator),
+                new SysCallRealloc(memoryAllocator),
+                new SysCallFree(memoryAllocator)];
 
             return new SysCallPlugin(sysCalls, "core");
         }
