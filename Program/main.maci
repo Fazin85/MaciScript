@@ -8,9 +8,9 @@ print("Hello World!")
 
 ; memory macros
 
-alloc(128)
-realloc(R0, 256)
-free(R0)
+alloc_buffer(32)
+realloc_buffer(R0, 64)
+free_buffer(R0)
 
 alloc_named_scope("scope")
 

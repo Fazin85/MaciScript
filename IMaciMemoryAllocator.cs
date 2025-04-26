@@ -3,7 +3,7 @@
     public interface IMaciMemoryAllocator
     {
         int Alloc(int size);
-        int Realloc(int ptr, int newSize);
-        void Free(int ptr);
+        void Realloc(int index, int newSize);
+        void Free(int index);
     }
 }
