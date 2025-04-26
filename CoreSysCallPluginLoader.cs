@@ -12,7 +12,7 @@
 
             public override void Call(ref MaciRuntimeData runtimeData)
             {
-                Console.WriteLine($"{runtimeData.SystemRegisters[1]}");
+                Console.WriteLine(runtimeData.SystemRegisters[1]);
             }
         }
 
@@ -215,6 +215,17 @@
             }
         }
 
+        private class SysCallPrintFloat : SysCall
+        {
+            public override int ID => 17;
+
+            public override void Call(ref MaciRuntimeData runtimeData)
+            {
+                float value = BitConverter.ToSingle(BitConverter.GetBytes(runtimeData.SystemRegisters[1]));
+                Console.WriteLine(value);
+            }
+        }
+
         public SysCallPlugin Load()
         {
             List<SysCall> sysCalls =
@@ -234,7 +245,8 @@
                 new SysCallPushVar(stackVariableAllocator),
                 new SysCallSetVar(stackVariableAllocator),
                 new SysCallPopScope(stackVariableAllocator),
-                new SysCallGetVar(stackVariableAllocator)
+                new SysCallGetVar(stackVariableAllocator),
+                new SysCallPrintFloat()
             ];
 
             return new SysCallPlugin(sysCalls, "core");

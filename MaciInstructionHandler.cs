@@ -113,6 +113,93 @@
                             runtimeData.Registers[destReg] /= runtimeData.Registers[srcReg];
                         }
                         break;
+                    case MaciOpcode.Fadd:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            float dstVal = IntBytesToFloat(runtimeData.Registers[destReg]);
+
+                            // Check if source is a register or immediate value
+                            if (instruction.Operands[1].IsReg)
+                            {
+                                int srcReg = instruction.Operands[1].Value;
+                                dstVal += IntBytesToFloat(runtimeData.Registers[srcReg]);
+
+                                runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                            }
+                            else
+                            {
+                                dstVal += IntBytesToFloat(instruction.Operands[1].Value);
+                            }
+
+                            runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                        }
+                        break;
+
+                    case MaciOpcode.Fsub:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            float dstVal = IntBytesToFloat(runtimeData.Registers[destReg]);
+
+                            // Check if source is a register or immediate value
+                            if (instruction.Operands[1].IsReg)
+                            {
+                                int srcReg = instruction.Operands[1].Value;
+                                dstVal -= IntBytesToFloat(runtimeData.Registers[srcReg]);
+
+                                runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                            }
+                            else
+                            {
+                                dstVal -= IntBytesToFloat(instruction.Operands[1].Value);
+                            }
+
+                            runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                        }
+                        break;
+
+                    case MaciOpcode.Fmul:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            float dstVal = IntBytesToFloat(runtimeData.Registers[destReg]);
+
+                            // Check if source is a register or immediate value
+                            if (instruction.Operands[1].IsReg)
+                            {
+                                int srcReg = instruction.Operands[1].Value;
+                                dstVal *= IntBytesToFloat(runtimeData.Registers[srcReg]);
+
+                                runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                            }
+                            else
+                            {
+                                dstVal *= IntBytesToFloat(instruction.Operands[1].Value);
+                            }
+
+                            runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                        }
+                        break;
+
+                    case MaciOpcode.Fdiv:
+                        {
+                            int destReg = instruction.Operands[0].Value;
+                            float dstVal = IntBytesToFloat(runtimeData.Registers[destReg]);
+
+                            // Check if source is a register or immediate value
+                            if (instruction.Operands[1].IsReg)
+                            {
+                                int srcReg = instruction.Operands[1].Value;
+                                dstVal /= IntBytesToFloat(runtimeData.Registers[srcReg]);
+
+                                runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                            }
+                            else
+                            {
+                                dstVal /= IntBytesToFloat(instruction.Operands[1].Value);
+                            }
+
+                            runtimeData.Registers[destReg] = FloatBytesToInt(dstVal);
+                        }
+                        break;
 
                     case MaciOpcode.And:
                         {
@@ -398,6 +485,16 @@
             {
                 throw new Exception($"Error executing instruction '{instruction.Opcode}': {ex.Message}");
             }
+        }
+
+        private static float IntBytesToFloat(int i)
+        {
+            return BitConverter.ToSingle(BitConverter.GetBytes(i));
+        }
+
+        private static int FloatBytesToInt(float f)
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(f));
         }
     }
 }

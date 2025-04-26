@@ -26,6 +26,12 @@ namespace MaciScript
             set => _flags = value ? (byte)(_flags | 0b0100) : (byte)(_flags & ~0b0100);
         }
 
+        public bool IsFloat
+        {
+            readonly get => (_flags & 0b1000) != 0;
+            set => _flags = value ? (byte)(_flags | 0b1000) : (byte)(_flags & ~0b1000);
+        }
+
         [FieldOffset(4)]
         public int Value;
     }

@@ -13,6 +13,11 @@
         Mul,
         Div,
 
+        Fadd,
+        Fsub,
+        Fmul,
+        Fdiv,
+
         // Bitwise
         And,
         Or,

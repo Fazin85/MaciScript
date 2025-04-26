@@ -1,4 +1,6 @@
-﻿namespace MaciScript
+﻿using System.Globalization;
+
+namespace MaciScript
 {
     public static class MaciScriptParser
     {
@@ -168,7 +170,15 @@
                 else
                 {
                     resultOperands[i].IsImmediate = true;
-                    resultOperands[i].Value = ParseImmediate(operands[i]);
+
+                    var immediate = ParseImmediate(operands[i]);
+
+                    if (immediate.Type == ImmediateValue.ImmediateType.Float)
+                    {
+                        resultOperands[i].IsFloat = true;
+                    }
+
+                    resultOperands[i].Value = immediate.Value;
                 }
             }
 
@@ -197,21 +207,51 @@
             return regNum;
         }
 
-        private static int ParseImmediate(string value)
+        private static ImmediateValue ParseImmediate(string value)
         {
             // Hex value
             if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
             {
-                return Convert.ToInt32(value[2..], 16);
+                return new()
+                {
+                    Type = ImmediateValue.ImmediateType.Int,
+                    Value = Convert.ToInt32(value[2..], 16)
+                };
+            }
+
+            // float value
+            if (value.Contains('.'))
+            {
+                return new()
+                {
+                    Type = ImmediateValue.ImmediateType.Float,
+                    Value = BitConverter.ToInt32(BitConverter.GetBytes(float.Parse(value, CultureInfo.InvariantCulture)))
+                };
             }
 
             // Decimal value
             if (int.TryParse(value, out int result))
             {
-                return result;
+                return new()
+                {
+                    Type = ImmediateValue.ImmediateType.Int,
+                    Value = result
+                };
             }
 
             throw new ArgumentException($"Invalid immediate value: {value}");
+        }
+
+        private struct ImmediateValue
+        {
+            public enum ImmediateType
+            {
+                Float,
+                Int
+            }
+
+            public required ImmediateType Type;
+            public required int Value;
         }
 
         public static MaciOpcode ParseOpcode(string opcodeStr)
