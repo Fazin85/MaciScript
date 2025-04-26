@@ -455,9 +455,7 @@
 
                     case MaciOpcode.Syscall:
                         {
-                            int syscallNumber = runtimeData.SystemRegisters[0];
-
-                            sysCallExecutor.Execute(ref runtimeData, syscallNumber);
+                            sysCallExecutor.Execute(ref runtimeData, runtimeData.Strings[instruction.Operands[0].Value]);
                         }
                         break;
 

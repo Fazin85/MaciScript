@@ -117,6 +117,26 @@ namespace MaciScript
                             throw new Exception($"No string at line {input.LineNumber}");
                         }
                     }
+                    else if (parsedOpcode == MaciOpcode.Syscall)
+                    {
+                        if (currentSymbols.StringLines.TryGetValue(input.LineNumber, out string? targetName))
+                        {
+                            targetName = Util.ExtractNestedQuotes(targetName) ?? throw new Exception("Failed to extract string from targetName");
+
+                            if (currentSymbols.StringToIndex.TryGetValue(targetName, out int index))
+                            {
+                                instruction.Operands[0].Value = index;
+                            }
+                            else
+                            {
+                                throw new Exception($"String not found: {targetName}");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"No string at line {input.LineNumber}");
+                        }
+                    }
                     else
                     {
                         instruction.Operands = ParseOperands(operandStrings);

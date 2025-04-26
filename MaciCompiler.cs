@@ -83,7 +83,7 @@
             int fileIndex)
         {
             MaciFunctionLoader functionLoader = new();
-            MaciStringLoader stringLoader = new(["ldstr"]);
+            MaciStringLoader stringLoader = new(["ldstr", "syscall"]);
             MaciLabelLoader labelLoader = new();
 
             List<string> imports = [];

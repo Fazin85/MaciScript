@@ -3,34 +3,21 @@ import core/sys.maci
 ; input: string literal, eg "Hello World!"
 macro print(string) {
 	push R0
-		get_syscall_id("PRINT_STRING")
-		mov S0 R0
-
 		ldstr R0 string
 		mov S1 R0
 	pop R0
 
-	syscall
+	syscall "PRINT_STRING"
 }
 
 macro print_int(value) {
-	push R0
-		get_syscall_id("PRINT_INT")
-		mov S0 R0
-	pop R0
-
 	mov S1 value
 
-	syscall
+	syscall "PRINT_INT"
 }
 
 macro print_float(value) {
-	push R0
-		get_syscall_id("PRINT_FLOAT")
-		mov S0 R0
-	pop R0
-
 	mov S1 value
 
-	syscall
+	syscall "PRINT_FLOAT"
 }
