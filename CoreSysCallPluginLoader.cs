@@ -26,7 +26,7 @@
             public override void Call(ref MaciRuntimeData runtimeData)
             {
                 string id = runtimeData.Strings[runtimeData.SystemRegisters[1]];
-                runtimeData.Registers[0] = syscalls[id].ID;
+                runtimeData.Registers[0] = Syscalls[id].ID;
             }
         }
 

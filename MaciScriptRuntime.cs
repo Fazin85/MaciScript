@@ -2,6 +2,8 @@
 {
     public static class MaciScriptRuntime
     {
+        //TODO: convert some syscalls to functions for better performance
+
         public static void Execute(ref MaciRuntimeData runtimeData, SysCallExecutor sysCallExecutor)
         {
             runtimeData.ProgramCounter = 0;

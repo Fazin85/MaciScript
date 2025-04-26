@@ -83,7 +83,7 @@
             int fileIndex)
         {
             MaciFunctionLoader functionLoader = new();
-            MaciStringLoader stringLoader = new();
+            MaciStringLoader stringLoader = new(["ldstr"]);
             MaciLabelLoader labelLoader = new();
 
             List<string> imports = [];

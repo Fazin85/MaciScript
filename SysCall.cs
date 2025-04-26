@@ -4,11 +4,11 @@
     {
         public abstract int ID { get; }
 
-        protected static Dictionary<string, SysCall> syscalls = [];
+        protected static Dictionary<string, SysCall> Syscalls { get; set; } = [];
 
         public SysCall(string name)
         {
-            syscalls.Add(name, this);
+            Syscalls.Add(name, this);
         }
 
         public abstract void Call(ref MaciRuntimeData runtimeData);
